@@ -31,3 +31,9 @@
 # Debug files
 *.dSYM/
 *.su
+
+# CSharp Directory files
+csharp/Properties
+csharp/bin
+*.userprefs
+
