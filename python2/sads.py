@@ -3,7 +3,9 @@ import sys
 
 class SADS():
 
-    def __init__(self, input_file):
+    def __init__(self, input_file, min_dist):
+        assert min_dist >= 2
+        self.min_dist = min_dist
         self.read_data(input_file)
         self.do_sads(self.input_sample)
 
@@ -31,7 +33,7 @@ class SADS():
         self.t.append(True)
 
     def find_critical_characters(self):
-        #find LMS characters first
+        # find LMS characters first
         self.p_1 = []
         s_found = False
         for index in range(len(self.t)):
@@ -42,11 +44,28 @@ class SADS():
             if not self.t[index] and s_found:
                 s_found = False
 
+        print(len(self.p_1))
+        print(self.p_1)
+
+        # find the rest of the critical characters
+        rest_p_1 = []
+        for lms_index in self.p_1:
+            index = lms_index + self.min_dist
+            if index not in self.p_1 and (index + 1) not in self.p_1:
+                rest_p_1.append(lms_index + self.min_dist)
+
+        print(len(rest_p_1))
+        print(rest_p_1)
+        
+        self.p_1 += rest_p_1
+
+        print(len(self.p_1))
+        print(self.p_1)
+
 def main():
-    sads = SADS(sys.argv[1])
-    print(sads.t)
-    print(len(sads.t))
-    print(sads.p_1)
+    sads = SADS(sys.argv[1], int(sys.argv[2]))
+#    print(sads.t)
+#    print(len(sads.t))
 
 if __name__ == '__main__':
     main()
