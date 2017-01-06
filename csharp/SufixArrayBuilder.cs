@@ -6,8 +6,8 @@ namespace bioinf_sufix_array
 {
 	class MainClass
 	{
-		public const bool LTYPE = true;
-		public const bool STYPE = false;
+		public const bool LTYPE = false;
+		public const bool STYPE = true;
 		public const bool BUCKET_END = true;
 		public const bool BUCKET_START = false;
 
@@ -25,41 +25,27 @@ namespace bioinf_sufix_array
 		public static void SA_DS (byte[] s, int[] sa, int alphabetSize, int recursionLevel)
 		{
 			bool[] t = new bool[s.Length];
-
 			mapLSType (s, t);
-
 			int[] P1 = new int[s.Length];
-
 			int n1 = getDCriticalPointers(s, t, P1);
-
-			int[] B = getBuckets (s, alphabetSize, BUCKET_END);
-
-//			for (int i = 0; i < sa.Length; i++) {
-//				sa [i] = -1;
-//			}
-//
-			// FIRST  STEP
-			for (int i = 0; i < n1; i++) {
-				sa[--B [s [P1 [i]]]] = P1[i];
-			}
-
-			Console.Out.WriteLine ("First step: SA: " + String.Join (" ", sa));
-//
-//			B = getBuckets (s, alphabetSize, BUCKET_START);
-//
-//			// SECOND STEP
-//			for (int i = 0; i < sa.Length; i++) {
-//				if (sa [i] > 0) {
-//					if (t [sa [i] - 1] == LTYPE) {
-//						sa [B [s [sa [i] - 1]]++] = sa [i] - 1;
-//					}
-//				}
-//			}
-//
-//			Console.Out.WriteLine ("Second step: SA: " + String.Join (" ", sa));
 
 			int[] b = new int[n1];
 			int[] a = P1;
+
+			byte[] sw = new byte[s.Length];
+			for (int i = 0; i < sw.Length; i++) {
+				if (t [i]) {
+					sw [i] = (byte)(2 * s [i] + 1);
+				} else {
+					sw [i] = (byte)(2 * s [i]);
+				}
+			}
+
+			int[] B = getBuckets (s, alphabetSize, BUCKET_END);
+
+			Console.Out.WriteLine ("Sw: " + String.Join (" ", sw));
+
+			Console.Out.WriteLine ("P1: " + String.Join (" ", P1));
 
 			for (int i = 0; i < d + 2; i++) {
 				if (i % 2 == 0) {
@@ -70,42 +56,7 @@ namespace bioinf_sufix_array
 					P1 = a;
 				}
 			}
-		
 			Console.Out.WriteLine ("Complete pass: " + String.Join (" ", P1));
-
-
-			// NAMING
-//			int[] tmp = new int[s.Length];
-//			for (int i = 0; i < s.Length - 1; i++) {
-//				tmp [i] = - 1;
-//			}
-//
-//			for (int i = 0; i < n1; i++) {
-//				tmp[P1[i]] = 
-//			}
-			int[] c = new int[alphabetSize + 1];
-			for (int i = 0; i < s.Length; i++) {
-				c [s [i]]++;
-			}
-
-			for (int i = 0, sum = 0; i < alphabetSize + 1; i++) {
-				int r = c [i]; c [i] = sum; sum += r; 
-			}
-
-			Console.Out.WriteLine("Buckets: " + String.Join(" ", c));
-			//for (int i = 0
-
-
-
-
-
-
-
-
-
-			//DEBUG P1
-			Console.Out.WriteLine ("S:" + s);
-			Console.Out.Write ("t:");
 			for (int i = 0; i < t.Length; i++) {
 				if (t [i] == LTYPE) {
 					Console.Out.Write ("L");
@@ -114,17 +65,38 @@ namespace bioinf_sufix_array
 				}
 			}
 			Console.Out.WriteLine ();
-			Console.Out.WriteLine ("P1:" + string.Join(" ", P1));
+			int name = 0;
+	
+			int[] S1 = new int[n1];
+			S1 [0] = name;
+			bool diff = false;
+			for (int i = 1; i < n1; i++) {
+				diff = false;
+				for (int j = 0; j < d + 2; j++) {
+					if (s [P1 [i - 1] + j] != s [P1 [i] + j]) {
+						diff = true;
+						S1 [i] = ++name;
+						break;
+					}
+				}
+				if (!diff) {
+					S1 [i] = name;
+				}
+			}
 
-
-
-
-	//		for (int i = 0; i < sa.Length; i++) {
-	//			sa [i] = -1;
-	//		}
-
-
-
+			int[] tmp = new int[s.Length];
+			for (int i = 0; i < tmp.Length; i++) {
+				tmp [i] = -1;
+			}
+			for (int i = n1 - 1; i >= 0; i--) {
+				tmp [P1 [i]] = S1 [i];
+			}
+			for (int i = 0, k = 0; i < s.Length; i++) {
+				if (tmp [i] != -1) {
+					S1 [k++] = tmp [i];
+				}
+			}
+			Console.Out.WriteLine ("S1: " + String.Join (" ", S1));
 		}
 
 
@@ -152,7 +124,7 @@ namespace bioinf_sufix_array
 			for (int i = 1; i < s.Length; i++) {
 				if (t [i] == STYPE && t [i - 1] == LTYPE) {
 					P1 [k++] = i;
-				} else if ((i >= d && i < s.Length - 1) && !(t [i + 1] == STYPE && t [i] == LTYPE)) {
+				} else if ((i >= d && i < s.Length - 1) && !(t[i + 1] == STYPE && t [i] == LTYPE)) {
 					if (k > 0 && P1 [k - 1] == i - d) {
 						P1 [k++] = i;
 					}
@@ -197,6 +169,21 @@ namespace bioinf_sufix_array
 				j = (j > s.Length - 1) ? s.Length - 1 : j;
 				b[c[s [j]]++] = a[i];
 			}
+		}
+
+		public static int[] getBucketBySiblings(int[] a, byte[] s, int n1, int alphabetSize, int d) {
+			int[] c = new int[alphabetSize + 1];
+
+			for (int i = 0, j = 0; i < n1; i++) {
+				j = a [i] + d;
+				j = (j > s.Length - 1) ? s.Length - 1 : j;
+				c [s[j]]++;
+			}
+
+			for (int i = 0, sum = 0; i < alphabetSize + 1; i++) {
+				int t = c [i]; c [i] = sum; sum += t; 
+			}
+			return c;
 		}
 
 
