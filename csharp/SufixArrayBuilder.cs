@@ -114,7 +114,7 @@ namespace bioinf_sufix_array
 
 		
 			if (name < n1 - 1) {
-				SA_DS (S1, SA1, name + 1, ++recursionLevel);
+				SA_DS (S1, SA1, name + 1, recursionLevel + 1);
 			} else {
 				SA1 = new int[S1.Length];
 				//induce SA1 from S1
@@ -133,9 +133,16 @@ namespace bioinf_sufix_array
 				SA[i] = -1;
 			}
 			int[] B = getBuckets (s, alphabetSize, BUCKET_END);
+
 			for (int i = SA1.Length - 1; i >= 0; i--) {
-				SA [--B [s [P_1[SA1 [i]]]]] = P_1 [SA1 [i]];
+				// check if is LMS and add to end of the bucket
+				if (P_1[SA1[i]] > 0 && t[P_1[SA1[i]]] == STYPE && t[P_1[SA1[i]]-1] == LTYPE) {
+					SA [--B [s [P_1[SA1 [i]]]]] = P_1 [SA1 [i]];
+				}
 			}
+
+			Console.Out.WriteLine ("Step 1: " + String.Join (" ", SA));
+
 
 			B = getBuckets (s, alphabetSize, BUCKET_START);
 			for (int i = 0; i < SA.Length; i++) {
@@ -145,14 +152,19 @@ namespace bioinf_sufix_array
 					}
 				}
 			}
+
+			Console.Out.WriteLine ("Step 2: " + String.Join (" ", SA));
+
 			B = getBuckets (s, alphabetSize, BUCKET_END);
-			for (int i = 0; i < SA.Length; i++) {
+			for (int i = SA.Length - 1; i >= 0; i--) {
 				if (SA [i] > 0) {
 					if (t [SA [i] - 1] == STYPE) {
 						SA[--B[s[SA[i] - 1]]] = SA[i] - 1;
 					}
 				}
 			}
+			Console.Out.WriteLine ("Step 3: " + String.Join (" ", SA));
+
 			for (int i = 0; i < sa.Length; i++) {
 				sa [i] = SA [i];
 			}
@@ -168,13 +180,14 @@ namespace bioinf_sufix_array
 
 
 		public static int[] getBuckets(int[] s, int alphabetSize, bool getEnds) {
-			int[] bucket = new int[alphabetSize + 1];
+			int[] bucket = new int[alphabetSize];
 			for (int i = 0; i < s.Length; i++) {
 				bucket [s [i]]++;
 			}
 			int sum = 0;
 			for (int i = 0; i < alphabetSize; i++) {
-				sum += bucket [i]++;
+				sum += bucket [i];
+				bucket [i]++;
 				bucket [i] = getEnds ? sum : sum - bucket [i];
 			}
 			return bucket;
