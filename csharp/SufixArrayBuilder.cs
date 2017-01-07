@@ -46,7 +46,10 @@ namespace bioinf_sufix_array
 				}
 			}
 
-			//int[] B = getBuckets (s, alphabetSize, BUCKET_END);
+			int[] P_1 = new int[n1];
+			for (int i = 0; i < n1; i++) {
+				P_1 [i] = P1 [i];
+			}
 
 			Console.Out.WriteLine ("Sw: " + String.Join (" ", sw));
 
@@ -92,6 +95,7 @@ namespace bioinf_sufix_array
 				}
 			}
 
+
 			int[] tmp = new int[s.Length];
 			for (int i = 0; i < tmp.Length; i++) {
 				tmp [i] = -1;
@@ -106,15 +110,55 @@ namespace bioinf_sufix_array
 			}
 			Console.Out.WriteLine ("S1: " + String.Join (" ", S1));
 
+			int[] SA1 = new int[S1.Length];
+
+		
 			if (name < n1 - 1) {
-				SA_DS (S1, sa, name, ++recursionLevel);
+				SA_DS (S1, SA1, name + 1, ++recursionLevel);
 			} else {
+				SA1 = new int[S1.Length];
 				//induce SA1 from S1
 				Console.Out.WriteLine ("Inducing SA1 from S1");
+				//Console.Out.WriteLine ("B: " + String.Join(" ", B) + " " +  alphabetSize);
+				for (int i = 0; i < SA1.Length; i++) {
+					SA1 [S1 [i]] = i;
+				}
+				Console.Out.WriteLine ("SA1: " + String.Join (" ", SA1));
 			}
 			//induce SA from SA1
-			Console.Out.WriteLine ("Inducing SA from SA1");
+			Console.Out.WriteLine ("Inducing SA from SA1: " + String.Join(" ", SA1));
+
+			int[] SA = new int[s.Length];
+			for (int i = 0; i < SA.Length; i++) {
+				SA[i] = -1;
+			}
+			int[] B = getBuckets (s, alphabetSize, BUCKET_END);
+			for (int i = SA1.Length - 1; i >= 0; i--) {
+				SA [--B [s [P_1[SA1 [i]]]]] = P_1 [SA1 [i]];
+			}
+
+			B = getBuckets (s, alphabetSize, BUCKET_START);
+			for (int i = 0; i < SA.Length; i++) {
+				if (SA [i] > 0) {
+					if (t [SA [i] - 1] == LTYPE) {
+						SA[++B[s[SA[i] - 1]]] = SA[i] - 1;
+					}
+				}
+			}
+			B = getBuckets (s, alphabetSize, BUCKET_END);
+			for (int i = 0; i < SA.Length; i++) {
+				if (SA [i] > 0) {
+					if (t [SA [i] - 1] == STYPE) {
+						SA[--B[s[SA[i] - 1]]] = SA[i] - 1;
+					}
+				}
+			}
+			for (int i = 0; i < sa.Length; i++) {
+				sa [i] = SA [i];
+			}
+			Console.Out.WriteLine ("SA: " + String.Join (" ", sa));
 		}
+
 
 
 
@@ -124,7 +168,7 @@ namespace bioinf_sufix_array
 
 
 		public static int[] getBuckets(int[] s, int alphabetSize, bool getEnds) {
-			int[] bucket = new int[alphabetSize];
+			int[] bucket = new int[alphabetSize + 1];
 			for (int i = 0; i < s.Length; i++) {
 				bucket [s [i]]++;
 			}
