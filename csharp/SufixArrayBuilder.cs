@@ -8,8 +8,8 @@ namespace bioinf_sufix_array
 {
 	class MainClass
 	{
-		public static bool DEBUG = false;
-		public static bool TEST = false;
+		public static bool DEBUG = true;
+		public static bool TEST = true;
 
 		public const bool LTYPE = false;
 		public const bool STYPE = true;
@@ -18,18 +18,19 @@ namespace bioinf_sufix_array
 
 		public const int d = 2;
 
-		//public static string test = "ATGCAAAATTTCCGGGGGAAATTTCCGGGGAAAATTT$";
+		//public static string test = "";
 		public static string test = "mmiissiissiippii";
 
 		public static void Main (string[] args)
 		{
-			List<string> lines = new List<string>(File.ReadLines ("../../../referent_model/test.fa"));
+			List<string> lines = new List<string>(File.ReadLines ("../../../referent_model/test2.fa"));
 			lines.RemoveAt (0);
 
 
 			//byte[] b = Encoding.ASCII.GetBytes (String.Join("", lines) + "$");
-			byte[] b = (TEST)? Encoding.ASCII.GetBytes (test + "\0") : Encoding.ASCII.GetBytes (String.Join("", lines) + "\0");
+			byte[] b = (TEST)? Encoding.ASCII.GetBytes (test + "\0") : Encoding.UTF8.GetBytes (String.Join("", lines)/*.Substring(0, 491)*/ + "\0");
 			int[] s = new int[b.Length];
+			int[] map = new int[256];
 
 			int[] sa = new int[s.Length];
 			for (int i = 0; i < b.Length; i++) {
@@ -38,8 +39,16 @@ namespace bioinf_sufix_array
 			if (File.Exists ("../../../referent_model/out2")) {
 				File.Delete ("../../../referent_model/out2");
 			}
-			SA_DS (s, sa, 255, 0);
-			Console.Out.WriteLine (isSorted (sa, s, s.Length));
+			for (int i = 0; i < s.Length; i++) {
+				map [s [i]]++;
+			}
+			for (int i = 0; i < map.Length; i++) {
+				if (map [i] != 0) {
+					Console.Out.WriteLine (i + " " + map[i]);
+				}
+			}
+			SA_DS (s, sa, 256, 0);
+			Console.Out.WriteLine ("Is sorted:" + isSorted (sa, s, s.Length));
 			using(StreamWriter outputFile = new StreamWriter ("../../../referent_model/out2", true)) {
 				for (int i = 0; i < sa.Length; i++) {
 					outputFile.WriteLine (sa [i]);
@@ -60,12 +69,12 @@ namespace bioinf_sufix_array
 			int[] b = new int[n1];
 			int[] a = new int[n1];
 
-			byte[] sw = new byte[s.Length];
+			int[] sw = new int[s.Length];
 			for (int i = 0; i < sw.Length; i++) {
 				if (t [i]) {
-					sw [i] = (byte)(2 * s [i] + 1);
+					sw [i] = (2 * s [i] + 1);
 				} else {
-					sw [i] = (byte)(2 * s [i]);
+					sw [i] = (2 * s [i]);
 				}
 			}
 
@@ -80,7 +89,9 @@ namespace bioinf_sufix_array
 			if (DEBUG)
 				logDebugLine ("P1: " + String.Join (" ", P1));
 			//bucketSortLS (P1, a, s, t, n1, d + 1);
-			a = P1;
+			for (int i = 0; i < n1; i++) {
+				a [i] = P1 [i];
+			}
 			for (int i = 0; i < d + 2; i++) {
 				if (i % 2 == 0) {
 					bucketSort (a, b, s, n1, alphabetSize, d + 1 - i);
@@ -96,9 +107,9 @@ namespace bioinf_sufix_array
 				logDebugLine ("Complete pass: " + String.Join (" ", P1));
 			for (int i = 0; i < t.Length; i++) {
 				if (t [i] == LTYPE) {
-					logDebug ("L");
+					logDebug ("0 ");
 				} else {
-					logDebug ("S");
+					logDebug ("1 ");
 				}
 			}
 			logDebugLine ("");
@@ -129,7 +140,7 @@ namespace bioinf_sufix_array
 			for (int i = 0; i < tmp.Length; i++) {
 				tmp [i] = -1;
 			}
-			for (int i = n1 - 1; i >= 0; i--) {
+			for (int i = 0; i < n1; i++) {
 				tmp [P1 [i]] = S1 [i];
 			}
 			for (int i = 0, k = 0; i < s.Length; i++) {
@@ -186,7 +197,7 @@ namespace bioinf_sufix_array
 			}
 			if (DEBUG)
 				logDebugLine ("Step 2: " + String.Join (" ", SA));
-
+			// P_1[SA1[i-1]] = LTYPE;
 			B = getBuckets (s, alphabetSize, BUCKET_END);
 			for (int i = SA.Length - 1; i >= 0; i--) {
 				if (SA [i] > 0) {
