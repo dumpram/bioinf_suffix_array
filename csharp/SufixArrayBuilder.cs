@@ -19,10 +19,15 @@ namespace bioinf_sufix_array
 		public static void Main (string[] args)
 		{
 			int[] sa = new int[test.Length];
-			SA_DS (Encoding.ASCII.GetBytes(test), sa, 255, 0);
+			byte[] b = Encoding.ASCII.GetBytes (test);
+			int[] s = new int[b.Length];
+			for (int i = 0; i < b.Length; i++) {
+				s [i] = (int)b [i];
+			}
+			SA_DS (s, sa, 255, 0);
 		}
 
-		public static void SA_DS (byte[] s, int[] sa, int alphabetSize, int recursionLevel)
+		public static void SA_DS (int[] s, int[] sa, int alphabetSize, int recursionLevel)
 		{
 			bool[] t = new bool[s.Length];
 			mapLSType (s, t);
@@ -41,7 +46,7 @@ namespace bioinf_sufix_array
 				}
 			}
 
-			int[] B = getBuckets (s, alphabetSize, BUCKET_END);
+			//int[] B = getBuckets (s, alphabetSize, BUCKET_END);
 
 			Console.Out.WriteLine ("Sw: " + String.Join (" ", sw));
 
@@ -68,9 +73,12 @@ namespace bioinf_sufix_array
 			int name = 0;
 	
 			int[] S1 = new int[n1];
-			S1 [0] = name;
 			bool diff = false;
-			for (int i = 1; i < n1; i++) {
+			for (int i = 0; i < n1; i++) {
+				if (i == 0) {
+					S1 [0] = name;
+					continue;
+				}
 				diff = false;
 				for (int j = 0; j < d + 2; j++) {
 					if (s [P1 [i - 1] + j] != s [P1 [i] + j]) {
@@ -97,16 +105,25 @@ namespace bioinf_sufix_array
 				}
 			}
 			Console.Out.WriteLine ("S1: " + String.Join (" ", S1));
+
+			if (name < n1 - 1) {
+				SA_DS (S1, sa, name, ++recursionLevel);
+			} else {
+				//induce SA1 from S1
+				Console.Out.WriteLine ("Inducing SA1 from S1");
+			}
+			//induce SA from SA1
+			Console.Out.WriteLine ("Inducing SA from SA1");
 		}
 
 
 
-		public static void SA_DS (int[] s, int[] sa, int alphabetSize, int recursionLevel) {
-		
-		}
+//		public static void SA_DS (int[] s, int[] sa, int alphabetSize, int recursionLevel) {
+			
+//		}
 
 
-		public static int[] getBuckets(byte[] s, int alphabetSize, bool getEnds) {
+		public static int[] getBuckets(int[] s, int alphabetSize, bool getEnds) {
 			int[] bucket = new int[alphabetSize];
 			for (int i = 0; i < s.Length; i++) {
 				bucket [s [i]]++;
@@ -119,7 +136,7 @@ namespace bioinf_sufix_array
 			return bucket;
 		}
 
-		public static int getDCriticalPointers(byte[] s, bool[] t, int[] P1) {
+		public static int getDCriticalPointers(int[] s, bool[] t, int[] P1) {
 			int k = 0;
 			for (int i = 1; i < s.Length; i++) {
 				if (t [i] == STYPE && t [i - 1] == LTYPE) {
@@ -137,7 +154,7 @@ namespace bioinf_sufix_array
 			return null;
 		}
 
-		public static void mapLSType(byte[] s, bool[] t) {
+		public static void mapLSType(int[] s, bool[] t) {
 			for (int i = s.Length - 1; i >= 0; i--) {
 				if (i == s.Length - 1) {
 					t [i] = STYPE;
@@ -150,7 +167,7 @@ namespace bioinf_sufix_array
 		}
 
 
-		public static void bucketSort(int[] a, int[] b, byte[] s, int n1, int alphabetSize, int d) {
+		public static void bucketSort(int[] a, int[] b, int[] s, int n1, int alphabetSize, int d) {
 
 			int[] c = new int[alphabetSize + 1];
 
