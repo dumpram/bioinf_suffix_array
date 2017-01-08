@@ -8,8 +8,8 @@ namespace bioinf_sufix_array
 {
 	class MainClass
 	{
-		public static bool DEBUG = true;
-		public static bool TEST = true;
+		public static bool DEBUG = false;
+		public static bool TEST = false;
 
 		public const bool LTYPE = false;
 		public const bool STYPE = true;
@@ -18,12 +18,12 @@ namespace bioinf_sufix_array
 
 		public const int d = 2;
 
-		//public static string test = "";
+		//public static string test = "fdasfklakdjflkdjafioejrafkmcal";
 		public static string test = "mmiissiissiippii";
 
 		public static void Main (string[] args)
 		{
-			List<string> lines = new List<string>(File.ReadLines ("../../../referent_model/test2.fa"));
+			List<string> lines = new List<string>(File.ReadLines ("../../../referent_model/test.fa"));
 			lines.RemoveAt (0);
 
 
@@ -48,7 +48,7 @@ namespace bioinf_sufix_array
 				}
 			}
 			SA_DS (s, sa, 256, 0);
-			Console.Out.WriteLine ("Is sorted:" + isSorted (sa, s, s.Length));
+			//Console.Out.WriteLine ("Is sorted:" + isSorted (sa, s, s.Length));
 			using(StreamWriter outputFile = new StreamWriter ("../../../referent_model/out2", true)) {
 				for (int i = 0; i < sa.Length; i++) {
 					outputFile.WriteLine (sa [i]);
@@ -88,10 +88,10 @@ namespace bioinf_sufix_array
 
 			if (DEBUG)
 				logDebugLine ("P1: " + String.Join (" ", P1));
-			//bucketSortLS (P1, a, s, t, n1, d + 1);
-			for (int i = 0; i < n1; i++) {
-				a [i] = P1 [i];
-			}
+			bucketSortLS (P1, a, s, t, n1, d + 1);
+			//for (int i = 0; i < n1; i++) {
+			//	a [i] = P1 [i];
+			//}
 			for (int i = 0; i < d + 2; i++) {
 				if (i % 2 == 0) {
 					bucketSort (a, b, s, n1, alphabetSize, d + 1 - i);
@@ -124,7 +124,7 @@ namespace bioinf_sufix_array
 				}
 				diff = false;
 				for (int j = 0; j < d + 2; j++) {
-					if (s [P1 [i - 1] + j] != s [P1 [i] + j]) {
+					if (sw [P1 [i - 1] + j] != sw [P1 [i] + j]) {
 						diff = true;
 						S1 [i] = ++name;
 						break;
@@ -191,7 +191,7 @@ namespace bioinf_sufix_array
 			for (int i = 0; i < SA.Length; i++) {
 				if (SA [i] > 0) {
 					if (t [SA [i] - 1] == LTYPE) {
-						SA[++B[s[SA[i] - 1]]] = SA[i] - 1;
+						SA[B[s[SA[i] - 1]]++] = SA[i] - 1;
 					}
 				}
 			}
@@ -232,7 +232,6 @@ namespace bioinf_sufix_array
 			int sum = 0;
 			for (int i = 0; i < alphabetSize; i++) {
 				sum += bucket [i];
-				bucket [i]++;
 				bucket [i] = getEnds ? sum : sum - bucket [i];
 			}
 			return bucket;
