@@ -34,8 +34,13 @@ class SADS():
         self.input_length = len(input_string)
 
         self.distinguish_L_and_S()
+        print(self.t)
         self.find_critical_substrings()
+        print(len(self.p_1))
+        print(self.p_1)
         self.bucket_sort()
+        print(len(self.s_1))
+        print(self.s_1)
 
     def distinguish_L_and_S(self):
         '''
@@ -45,13 +50,12 @@ class SADS():
         If S[i] > S[i+1] or S[i] = S[i+1] charcater is classified as L type.
         '''
 
-        self.t = []
-        current_mark = False
-        for index in range(len(self.input_string)-1):
+        self.t = [True]
+        current_mark = True
+        for index in reversed(range(len(self.input_string)-1)):
             if self.input_string[index] != self.input_string[index+1]:
                 current_mark = (self.input_string[index] < self.input_string[index+1])
-            self.t.append(current_mark)
-        self.t.append(True)
+            self.t.insert(0,current_mark)
 
     def find_critical_substrings(self):
         '''
@@ -94,27 +98,75 @@ class SADS():
         
     def bucket_sort(self):
         '''
-        Bucket sorts all the d-critical substrings according to their omega weight
+        Bucket sorts all the d-critical substrings according to their omega weight and generates S1 array
         '''
 
         omega = lambda i: 2 * self.input_string[i] + self.t[i]
 
+        p_1_ordered = list(zip(self.p_1, range(len(self.p_1))))  # we need indicies of elements inside P1 for later
 
         for current_d in reversed(range(self.min_dist+2)):       # for each index in substring, starting from LSD
             map_buckets = {}                                     # init buckets
     
-            for crit_index in self.p_1:                          # for each critical substring
+            for crit_entry in p_1_ordered:                       # crit_entry = (critical index, index of crit index inside P1)
+                crit_index = crit_entry[0]
                 current_index = (crit_index+current_d) if ((crit_index+current_d) < self.input_length) else (self.input_length-1)
                 current_omega = omega(current_index)
                 if not current_omega in map_buckets:
                     map_buckets[current_omega] = []
-                map_buckets[current_omega].append(crit_index)
+                map_buckets[current_omega].append(crit_entry)
+            
+            p_1_ordered = []                                     # they are now in map_buckets, free up memory
 
             key_entries_sorted = sorted(map_buckets.items())     # sort over keys
+            map_buckets = None                                   # they are now in key_entries_sorted, free up memory
 
-            self.p_1 = []
-            for key_entry in key_entries_sorted:                 # reorder
-                self.p_1.extend(key_entry[1])
+
+            if current_d != 0:
+                for key_entry in key_entries_sorted:             # reorder, key_entry = (bucket map key, list of (crit_entry))
+                    p_1_ordered.extend(key_entry[1])
+
+                key_entries_sorted = None                        # free up memory
+
+            else:                                                # if this is the last pass create S1
+                s_index = 0
+                prev_substring = None
+                self.s_1 = [None] * len(self.p_1)                # generate S1 array from sorted crit indicies
+                duplicate_index = False
+                for key_entry in key_entries_sorted:
+                    for crit_entry in key_entry[1]:
+                        current_substring = self.get_d_critical_substring(crit_entry[0])
+
+                        if (prev_substring != None) and (prev_substring != current_substring):
+                            s_index += 1
+                        else:
+                            duplicate_index = True
+
+                        self.s_1[crit_entry[1]] = s_index
+                        prev_substring = current_substring
+                        
+                if duplicate_index:
+                    # recursive call
+                    # new_sads = SADS()
+                    # new_sads.do_sads(self.s_1)
+                    pass
+
+    def get_d_critical_substring(self, index):
+        '''
+        Returnes d-critical substring for given d-critical index
+
+        Since d-critical substring's is d+2 characters long, possible
+        lack of characters is solved by appending string's last character
+        (multiple times if necessary)
+        '''
+
+        if index + self.min_dist + 2 <= self.input_length:
+            end_index = index + self.min_dist + 2
+            return self.input_string[index:end_index]
+        else:
+            indices_missing = (index + self.min_dist + 2 - self.input_length)
+            return self.input_string[index:self.input_length] + (indices_missing * [self.input_string[-1]])
+
 
 def main():
     sads = SADS(sys.argv[1], int(sys.argv[2]))
