@@ -27,10 +27,9 @@ int i;
         }
 }
 
-void find_d_critical_characters(bool* LMS_ch, int N, int d, bool* d_ch, int* a)
+int find_d_critical_characters(bool* LMS_ch, int N, int d, bool* d_ch, int* P1)
 {
 int i, j, p=0;
-int* P1=(int*)malloc(sizeof(int));
 
     d_ch[0]=false;
     d_ch[N]=true;
@@ -42,7 +41,6 @@ int* P1=(int*)malloc(sizeof(int));
             d_ch[i]=true;
             P1[p]=i;
             p++;
-            P1=(int*)realloc(P1,sizeof(int)*(p+1));
         }
         else if((i-d)<=0)
         {
@@ -66,7 +64,6 @@ int* P1=(int*)malloc(sizeof(int));
                 {
                     P1[p]=i;
                     p++;
-                    P1=(int*)realloc(P1,sizeof(int)*(p+1));
                 }
             }
             else
@@ -76,33 +73,38 @@ int* P1=(int*)malloc(sizeof(int));
         }
     }
 P1[p]=N;
-*a=P1;
-a++;
-*a=p;
+return p;
 }
 
 
-void calculate_Sw(int* s, int* Sw, int N, bool* t){
+void calculate_Sw(int* s, int* Sw, int N, bool* t)
+{
 int i;
 
     for (i=0;i<=N+1;i++)
     {
-        Sw[i]=2*s[i]+t[i];
+        Sw[i]=2*s[i]+(int)t[i];
     }
 
 }
 
 
-void bucket_sort(int* P1, int d, int n1, int* S1)
+void bucket_sort_LS(int* a, int* b, int d, int n1, int* s, bool* t)
 {
+int c[2]={0,n1};
+int i, j=0;
 
-
-
-
-
-
-
-
-
-
+    for(i=0; i<=n1; i++)
+    {
+        j=a[i] + d;
+        if(j>n1) j=n1;
+        if(t[j]==1)
+        {
+            b[c[1]--] = a[i];
+        }
+        else
+        {
+            b[c[0]++] = a[i];
+        }
+    }
 }

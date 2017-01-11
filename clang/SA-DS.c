@@ -73,25 +73,20 @@ bool LS_type[N];
     }
 
 bool d_critical_ch[N];
-int *a=(int*)malloc(sizeof(int)*2);
-int* P1;
 int n1;
+int P1[N/2];
 int d=2;
 
-    find_d_critical_characters(LMS_characters, N, d, d_critical_ch, a);
+    n1=find_d_critical_characters(LMS_characters, N, d, d_critical_ch, P1);
     printf("\nd_crit_ch=");
     for(i=0;i<=N;i++)
     {
         printf("%d",d_critical_ch[i]);
     }
-    P1=*a;
-    a++;
-    n1=*a;
     printf("\nP1=  ");
     for(i=0;i<=n1;i++)
     {
-        printf("%d ",*P1);
-        P1++;
+        printf("%d ",P1[i]);
     }
 
 int Sw[N];
@@ -104,11 +99,12 @@ int Sw[N];
     }
 
 //Bucket LS
+int a[n1], b[n1];
 
+    bucket_sort_LS(P1, a, d+1, n1, s, LS_type);
 
-//int* S1=malloc(sizeof(int)*n1);
+//bucket_sort
 
-    //bucket_sort(P1, d, n1, S1);
 
 return 0;
 
