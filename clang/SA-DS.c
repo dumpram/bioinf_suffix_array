@@ -8,7 +8,7 @@ void find_lms(char* s, int N, bool* LMS);
 int main()
 {
 FILE *fp;
-int n, m, i;
+int n, N, i;
 
 //opening file and saving characters into an array
     if(!(fp = fopen("test.txt", "r+")))
@@ -23,7 +23,7 @@ int n, m, i;
     printf("%d\n", n);
 
 //char s[n];
-char *s = (char*) malloc(n);
+int *s = (int*) malloc(sizeof(int)*n);
 char c;
 int z=0;
 
@@ -38,48 +38,77 @@ int z=0;
             z=1;
             break;
         }
-        if(c != '\n') s[i]=c;
+        if(c != '\n') s[i]=(int)c;
         else i--;
         printf("%c", s[i]);
     }
     s[i]='$';
-    s[i+1]='\0';
-    m = i;
-    s = (char*) realloc(s,i);
+    N = i;
+    s = (int*) realloc(s,sizeof(int)*i);
     printf("\n%d", i);
-    printf("\n%s", s);
+    printf("\nS=  ");
+    for(i=0;i<=N;i++)
+    {
+        printf("%d ",s[i]);
+    }
     printf("\nz=%d\n", z);
     fclose(fp);
 
 // start of algorithm
-bool LMS_characters[m];
+bool LMS_characters[N];
+bool LS_type[N];
 
-    find_lms_characters(s,m,LMS_characters);
+    find_lms_characters(s, N, LMS_characters, LS_type);
+    printf("LS=       ");
+    for(i=0;i<=N;i++)
+    {
+        printf("%d",LS_type[i]);
+    }
+    printf("\n");
+
     printf("LMS_ch=   ");
-    for(i=0;i<=m;i++)
+    for(i=0;i<=N;i++)
     {
         printf("%d",LMS_characters[i]);
     }
 
-bool d_critical_ch[m];
-int* a[2];
+bool d_critical_ch[N];
+int *a=(int*)malloc(sizeof(int)*2);
 int* P1;
-int p_cnt;
+int n1;
 int d=2;
 
-    find_d_critical_characters(LMS_characters, m, d, d_critical_ch, a);
-    P1=a[0];
-    p_cnt=a[1];
+    find_d_critical_characters(LMS_characters, N, d, d_critical_ch, a);
     printf("\nd_crit_ch=");
-    for(i=0;i<=m;i++)
+    for(i=0;i<=N;i++)
     {
         printf("%d",d_critical_ch[i]);
     }
+    P1=*a;
+    a++;
+    n1=*a;
     printf("\nP1=  ");
-    for(i=0;i<=p_cnt;i++)
+    for(i=0;i<=n1;i++)
     {
-        printf("%d ",P1[i]);
+        printf("%d ",*P1);
+        P1++;
     }
+
+int Sw[N];
+
+    calculate_Sw(s, Sw, N, LS_type);
+    printf("\nSw=  ");
+    for(i=0;i<=N;i++)
+    {
+        printf("%d ",Sw[i]);
+    }
+
+//Bucket LS
+
+
+//int* S1=malloc(sizeof(int)*n1);
+
+    //bucket_sort(P1, d, n1, S1);
 
 return 0;
 
