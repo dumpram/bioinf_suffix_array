@@ -89,7 +89,7 @@ int i;
 }
 
 
-void bucket_sort_LS(int* a, int* b, int d, int n1, int* s, bool* t)
+void bucket_sort_LS(int* a, int* b, int d, int n1, int N, int* s, bool* t)
 {
 int c[2]={0,n1};
 int i, j=0;
@@ -97,7 +97,7 @@ int i, j=0;
     for(i=0; i<=n1; i++)
     {
         j=a[i] + d;
-        if(j>n1) j=n1;
+        if(j>N) j=N;
         if(t[j]==1)
         {
             b[c[1]--] = a[i];
@@ -108,3 +108,34 @@ int i, j=0;
         }
     }
 }
+
+void bucket_sort(int* a, int* b, int* s, int n1, int N, int alphabetSize, int d)
+{
+int c[alphabetSize];
+int i=0, j=0, sum=0, tmp=0;
+
+    memset(c, 0, alphabetSize*sizeof(int));
+    for(i=0;i<=n1;i++)
+    {
+        j=a[i] + d;
+        if(j>N) j=N;
+        c[s[j]]++;
+    }
+
+    for(i=0; i<alphabetSize; i++)
+    {
+        tmp=c[i];
+        c[i]=sum;
+        sum += tmp;
+    }
+
+    for(i=0,j=0;i<=n1;i++)
+    {
+        j=a[i] + d;
+        if(j>N) j=N;
+        b[c[s[j]]++] = a[i];
+    }
+}
+
+
+

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <d_critical.h>
@@ -55,8 +56,8 @@ int z=0;
     fclose(fp);
 
 // start of algorithm
-bool LMS_characters[N];
-bool LS_type[N];
+bool LMS_characters[N+1];
+bool LS_type[N+1];
 
     find_lms_characters(s, N, LMS_characters, LS_type);
     printf("LS=       ");
@@ -72,9 +73,9 @@ bool LS_type[N];
         printf("%d",LMS_characters[i]);
     }
 
-bool d_critical_ch[N];
+bool d_critical_ch[N+1];
 int n1;
-int P1[N/2];
+int P1[(N+1)/2];
 int d=2;
 
     n1=find_d_critical_characters(LMS_characters, N, d, d_critical_ch, P1);
@@ -89,7 +90,7 @@ int d=2;
         printf("%d ",P1[i]);
     }
 
-int Sw[N];
+int Sw[N+1];
 
     calculate_Sw(s, Sw, N, LS_type);
     printf("\nSw=  ");
@@ -99,12 +100,40 @@ int Sw[N];
     }
 
 //Bucket LS
-int a[n1], b[n1];
+int a[n1+1], b[n1+1];
+int j=0,alphabetSize=256;
 
-    bucket_sort_LS(P1, a, d+1, n1, s, LS_type);
+    bucket_sort_LS(P1, a, d+1, n1, N, s, LS_type);
+
+    printf("SortLS:");
+    for(j=0;j<=n1;j++)
+    {
+        printf(" %d", a[j]);
+    }
+    printf("\n\n");
 
 //bucket_sort
 
+    for(i=0; i<d+2;i++)
+    {
+        if(i % 2 == 0)
+        {
+            bucket_sort(a, b, s, n1, N, alphabetSize, d+1-i);
+            memcpy(P1,b,sizeof(int)*(n1+1));
+
+        }
+        else
+        {
+            bucket_sort(b, a, s, n1, N, alphabetSize, d+1-i);
+            memcpy(P1,a,sizeof(int)*(n1+1));
+        }
+        printf("Sort%d:",i);
+        for(j=0;j<=n1;j++)
+        {
+            printf(" %d", P1[j]);
+        }
+        printf("\n");
+    }
 
 return 0;
 
