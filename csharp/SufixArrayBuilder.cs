@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Text;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +23,7 @@ namespace bioinf_sufix_array
 		public static void Main (string[] args)
 		{
 			if (args.Length != 2 && args.Length != 3) {
-				Console.Error.WriteLine ("Provide args: d out | d out in"); 
+				Console.Error.WriteLine ("Provide args: d out | d out in");
 				return;
 			}
 
@@ -41,10 +42,19 @@ namespace bioinf_sufix_array
 
 			if (args.Length == 3) {
 				lines = new List<string> (File.ReadLines (args [2]));
-				lines.RemoveAt (0);
 			}
 
-			byte[] b = (TEST) ? Encoding.ASCII.GetBytes (test + "\0") : 
+            List<string> newLines = new List<string>();
+
+
+            foreach (String line in lines) {
+				if (line.StartsWith (">")) {
+					continue;
+				}
+				newLines.Add (line);
+			}
+
+			byte[] b = (TEST) ? Encoding.ASCII.GetBytes (test + "\0") :
 				Encoding.UTF8.GetBytes (String.Join ("", lines) + "\0");
 			int[] s = new int[b.Length];
 
@@ -53,11 +63,23 @@ namespace bioinf_sufix_array
 			for (int i = 0; i < b.Length; i++) {
 				s [i] = (int)b [i];
 			}
-
+			lines = null;
+			newLines = null;
+			b = null;
+			// start measurment of time and memory
+			System.GC.Collect ();
+			Process currentProcess = 
+				System.Diagnostics.Process.GetCurrentProcess();
+			long memoryBefore = currentProcess.PeakWorkingSet64;
+			Stopwatch sw = new Stopwatch();
+			sw.Start ();
 			SA_DS (s, sa, 256, 0);
+			sw.Stop ();
+			long memoryAfter = currentProcess.PeakWorkingSet64;
 
 			Console.Out.WriteLine ("Is sorted:" + isSorted (sa, s, s.Length));
-
+			Console.Out.WriteLine (sw.ElapsedMilliseconds + " " 
+			                       + (memoryAfter - memoryBefore));
 			using (StreamWriter outputFile = new StreamWriter (args[1], true)) {
 				for (int i = 0; i < sa.Length; i++) {
 					outputFile.WriteLine (sa [i]);
@@ -65,7 +87,7 @@ namespace bioinf_sufix_array
 			}
 		}
 
-		public static void SA_DS (int[] s, int[] SA, int alphabetSize, int 
+		public static void SA_DS (int[] s, int[] SA, int alphabetSize, int
 		                          recursionLevel)
 		{
 			bool[] t = new bool[s.Length];
@@ -105,7 +127,7 @@ namespace bioinf_sufix_array
 					P1 = a;
 				}
 				if (DEBUG)
-					logDebugLine ("Sort " + (i + 1) + ":" 
+					logDebugLine ("Sort " + (i + 1) + ":"
 					              + String.Join (" ", P1));
 			}
 			if (DEBUG)
@@ -119,7 +141,7 @@ namespace bioinf_sufix_array
 			}
 			logDebugLine ("");
 			int name = 0;
-	
+
 			int[] S1 = new int[n1];
 			bool diff = false;
 			for (int i = 0; i < n1; i++) {
@@ -157,9 +179,10 @@ namespace bioinf_sufix_array
 
 			int[] SA1 = new int[S1.Length];
 
-		
+
 			if (name < n1 - 1) {
 				SA_DS (S1, SA1, name + 1, recursionLevel + 1);
+				System.GC.Collect ();
 			} else {
 				SA1 = new int[S1.Length];
 				//induce SA1 from S1
@@ -173,7 +196,7 @@ namespace bioinf_sufix_array
 			}
 			//induce SA from SA1
 			if (DEBUG)
-				logDebugLine ("Inducing SA from SA1: " + 
+				logDebugLine ("Inducing SA from SA1: " +
 				              String.Join (" ", SA1));
 
 			for (int i = 0; i < SA.Length; i++) {
@@ -183,7 +206,7 @@ namespace bioinf_sufix_array
 
 			for (int i = SA1.Length - 1; i >= 0; i--) {
 				// check if is LMS and add to end of the bucket
-				if (t [P_1 [SA1 [i]]] == STYPE && 
+				if (t [P_1 [SA1 [i]]] == STYPE &&
 				    	t [P_1 [SA1 [i]] - 1] == LTYPE) {
 					SA [--B [s [P_1 [SA1 [i]]]]] = P_1 [SA1 [i]];
 				}
@@ -249,7 +272,7 @@ namespace bioinf_sufix_array
 			for (int i = s.Length - 1; i >= 0; i--) {
 				if (i == s.Length - 1) {
 					t [i] = STYPE;
-				} else if (s [i] > s [i + 1] || 
+				} else if (s [i] > s [i + 1] ||
 				           s [i] == s [i + 1] && t [i + 1] == LTYPE) {
 					t [i] = LTYPE;
 				} else {
@@ -258,7 +281,7 @@ namespace bioinf_sufix_array
 			}
 		}
 
-		public static void bucketSort (int[] a, int[] b, int[] s, int n1, 
+		public static void bucketSort (int[] a, int[] b, int[] s, int n1,
 		                               int alphabetSize, int d)
 		{
 
@@ -273,7 +296,7 @@ namespace bioinf_sufix_array
 			for (int i = 0, sum = 0; i < alphabetSize; i++) {
 				int t = c [i];
 				c [i] = sum;
-				sum += t; 
+				sum += t;
 			}
 
 			for (int i = 0, j = 0; i < n1; i++) {
@@ -283,7 +306,7 @@ namespace bioinf_sufix_array
 			}
 		}
 
-		public static void bucketSortLS (int[] a, int[] b, int[] s, bool[] t, 
+		public static void bucketSortLS (int[] a, int[] b, int[] s, bool[] t,
 		                                 int n1, int d)
 		{
 
@@ -292,7 +315,7 @@ namespace bioinf_sufix_array
 			for (int i = 0, j = 0;  i < n1; i++) {
 				j = a[i] + d;
 				j = (j > s.Length - 1) ? s.Length - 1 : j;
-				if (t[j] == STYPE) { 
+				if (t[j] == STYPE) {
 					b[c[1]--] = a[i];
 				} else {
 					b[c[0]++] = a[i];
@@ -333,8 +356,3 @@ namespace bioinf_sufix_array
 
 	}
 }
-
-
-
-
-

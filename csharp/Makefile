@@ -5,12 +5,12 @@
 ##############################################################################
 
 
-all : sads.exe
+all : run
 
 sads.exe : SufixArrayBuilder.cs
 	mono-csc -out:$@ $<
 
-run : all
+run : sads.exe
 	mono sads.exe $(d) $(out) $(in) 
 
 clean :
