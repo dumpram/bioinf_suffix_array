@@ -11,7 +11,7 @@ sads.exe : SufixArrayBuilder.cs
 	mono-csc -out:$@ $<
 
 run : all
-	mono sads.exe
+	mono sads.exe $(d) $(out) $(in) 
 
 clean :
 	rm sads.exe

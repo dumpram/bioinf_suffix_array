@@ -3,68 +3,75 @@ using System.Text;
 using System.Collections.Generic;
 using System.IO;
 
-
 namespace bioinf_sufix_array
 {
 	class MainClass
 	{
-		public static bool DEBUG = false;
-		public static bool TEST = false;
-
+		// Constants
 		public const bool LTYPE = false;
 		public const bool STYPE = true;
 		public const bool BUCKET_END = true;
 		public const bool BUCKET_START = false;
 
-		public const int d = 2;
-
-		//public static string test = "fdasfklakdjflkdjafioejrafkmcal";
+		// Algorithm parameters
+		public static bool DEBUG = false;
+		public static bool TEST = false;
+		public static int d = 2;
 		public static string test = "mmiissiissiippii";
 
 		public static void Main (string[] args)
 		{
-			List<string> lines = new List<string>(File.ReadLines ("../../../referent_model/test.fa"));
-			lines.RemoveAt (0);
+			if (args.Length != 2 && args.Length != 3) {
+				Console.Error.WriteLine ("Provide args: d out | d out in"); 
+				return;
+			}
 
+			d = int.Parse (args [0]);
 
-			//byte[] b = Encoding.ASCII.GetBytes (String.Join("", lines) + "$");
-			byte[] b = (TEST)? Encoding.ASCII.GetBytes (test + "\0") : Encoding.UTF8.GetBytes (String.Join("", lines)/*.Substring(0, 491)*/ + "\0");
+			if (args.Length == 2) {
+				TEST = true;
+				DEBUG = true;
+			}
+
+			if (File.Exists (args [1])) {
+				File.Delete (args [1]);
+			}
+
+			List<string> lines = null;
+
+			if (args.Length == 3) {
+				lines = new List<string> (File.ReadLines (args [2]));
+				lines.RemoveAt (0);
+			}
+
+			byte[] b = (TEST) ? Encoding.ASCII.GetBytes (test + "\0") : 
+				Encoding.UTF8.GetBytes (String.Join ("", lines) + "\0");
 			int[] s = new int[b.Length];
-			int[] map = new int[256];
 
 			int[] sa = new int[s.Length];
+
 			for (int i = 0; i < b.Length; i++) {
 				s [i] = (int)b [i];
 			}
-			if (File.Exists ("../../../referent_model/out2")) {
-				File.Delete ("../../../referent_model/out2");
-			}
-			for (int i = 0; i < s.Length; i++) {
-				map [s [i]]++;
-			}
-			for (int i = 0; i < map.Length; i++) {
-				if (map [i] != 0) {
-					Console.Out.WriteLine (i + " " + map[i]);
-				}
-			}
+
 			SA_DS (s, sa, 256, 0);
-			//Console.Out.WriteLine ("Is sorted:" + isSorted (sa, s, s.Length));
-			using(StreamWriter outputFile = new StreamWriter ("../../../referent_model/out2", true)) {
+
+			Console.Out.WriteLine ("Is sorted:" + isSorted (sa, s, s.Length));
+
+			using (StreamWriter outputFile = new StreamWriter (args[1], true)) {
 				for (int i = 0; i < sa.Length; i++) {
 					outputFile.WriteLine (sa [i]);
 				}
 			}
 		}
 
-		public static void SA_DS (int[] s, int[] sa, int alphabetSize, int recursionLevel)
+		public static void SA_DS (int[] s, int[] SA, int alphabetSize, int 
+		                          recursionLevel)
 		{
-			if (s [s.Length - 1] != 0) {
-				Console.Out.WriteLine ("ERROR");
-			}
 			bool[] t = new bool[s.Length];
 			mapLSType (s, t);
 			int[] P1 = new int[s.Length];
-			int n1 = getDCriticalPointers(s, t, P1);
+			int n1 = getDCriticalPointers (s, t, P1);
 
 			int[] b = new int[n1];
 			int[] a = new int[n1];
@@ -89,9 +96,6 @@ namespace bioinf_sufix_array
 			if (DEBUG)
 				logDebugLine ("P1: " + String.Join (" ", P1));
 			bucketSortLS (P1, a, s, t, n1, d + 1);
-			//for (int i = 0; i < n1; i++) {
-			//	a [i] = P1 [i];
-			//}
 			for (int i = 0; i < d + 2; i++) {
 				if (i % 2 == 0) {
 					bucketSort (a, b, s, n1, alphabetSize, d + 1 - i);
@@ -100,8 +104,9 @@ namespace bioinf_sufix_array
 					bucketSort (b, a, s, n1, alphabetSize, d + 1 - i);
 					P1 = a;
 				}
-			if (DEBUG)
-				logDebugLine ("Sort " + (i + 1) + ":" + String.Join (" ", P1));
+				if (DEBUG)
+					logDebugLine ("Sort " + (i + 1) + ":" 
+					              + String.Join (" ", P1));
 			}
 			if (DEBUG)
 				logDebugLine ("Complete pass: " + String.Join (" ", P1));
@@ -135,7 +140,6 @@ namespace bioinf_sufix_array
 				}
 			}
 
-
 			int[] tmp = new int[s.Length];
 			for (int i = 0; i < tmp.Length; i++) {
 				tmp [i] = -1;
@@ -160,7 +164,7 @@ namespace bioinf_sufix_array
 				SA1 = new int[S1.Length];
 				//induce SA1 from S1
 				logDebugLine ("Inducing SA1 from S1");
-				//logDebugLine ("B: " + String.Join(" ", B) + " " +  alphabetSize);
+
 				for (int i = 0; i < SA1.Length; i++) {
 					SA1 [S1 [i]] = i;
 				}
@@ -169,18 +173,19 @@ namespace bioinf_sufix_array
 			}
 			//induce SA from SA1
 			if (DEBUG)
-				logDebugLine ("Inducing SA from SA1: " + String.Join(" ", SA1));
+				logDebugLine ("Inducing SA from SA1: " + 
+				              String.Join (" ", SA1));
 
-			int[] SA = new int[s.Length];
 			for (int i = 0; i < SA.Length; i++) {
-				SA[i] = -1;
+				SA [i] = -1;
 			}
 			int[] B = getBuckets (s, alphabetSize, BUCKET_END);
 
 			for (int i = SA1.Length - 1; i >= 0; i--) {
 				// check if is LMS and add to end of the bucket
-				if (t[P_1[SA1[i]]] == STYPE && t[P_1[SA1[i]]-1] == LTYPE) {
-					SA [--B [s [P_1[SA1 [i]]]]] = P_1 [SA1 [i]];
+				if (t [P_1 [SA1 [i]]] == STYPE && 
+				    	t [P_1 [SA1 [i]] - 1] == LTYPE) {
+					SA [--B [s [P_1 [SA1 [i]]]]] = P_1 [SA1 [i]];
 				}
 			}
 			if (DEBUG)
@@ -191,40 +196,27 @@ namespace bioinf_sufix_array
 			for (int i = 0; i < SA.Length; i++) {
 				if (SA [i] > 0) {
 					if (t [SA [i] - 1] == LTYPE) {
-						SA[B[s[SA[i] - 1]]++] = SA[i] - 1;
+						SA [B [s [SA [i] - 1]]++] = SA [i] - 1;
 					}
 				}
 			}
 			if (DEBUG)
 				logDebugLine ("Step 2: " + String.Join (" ", SA));
-			// P_1[SA1[i-1]] = LTYPE;
+
 			B = getBuckets (s, alphabetSize, BUCKET_END);
 			for (int i = SA.Length - 1; i >= 0; i--) {
 				if (SA [i] > 0) {
 					if (t [SA [i] - 1] == STYPE) {
-						SA[--B[s[SA[i] - 1]]] = SA[i] - 1;
+						SA [--B [s [SA [i] - 1]]] = SA [i] - 1;
 					}
 				}
 			}
 			if (DEBUG)
 				logDebugLine ("Step 3: " + String.Join (" ", SA));
-
-			for (int i = 0; i < sa.Length; i++) {
-				sa [i] = SA [i];
-			}
-			if (DEBUG)
-				logDebugLine ("SA: " + String.Join (" ", sa));
 		}
 
-
-
-
-//		public static void SA_DS (int[] s, int[] sa, int alphabetSize, int recursionLevel) {
-			
-//		}
-
-
-		public static int[] getBuckets(int[] s, int alphabetSize, bool getEnds) {
+		public static int[] getBuckets (int[] s, int alphabetSize, bool getEnds)
+		{
 			int[] bucket = new int[alphabetSize];
 			for (int i = 0; i < s.Length; i++) {
 				bucket [s [i]]++;
@@ -237,12 +229,13 @@ namespace bioinf_sufix_array
 			return bucket;
 		}
 
-		public static int getDCriticalPointers(int[] s, bool[] t, int[] P1) {
+		public static int getDCriticalPointers (int[] s, bool[] t, int[] P1)
+		{
 			int k = 0;
 			for (int i = 1; i < s.Length; i++) {
 				if (t [i] == STYPE && t [i - 1] == LTYPE) {
 					P1 [k++] = i;
-				} else if (/*(i >= d && i < s.Length - 1) && */ !(t[i + 1] == STYPE && t [i] == LTYPE)) {
+				} else if (!(t [i + 1] == STYPE && t [i] == LTYPE)) {
 					if (k > 0 && P1 [k - 1] == i - d) {
 						P1 [k++] = i;
 					}
@@ -251,15 +244,13 @@ namespace bioinf_sufix_array
 			return k;
 		}
 
-		public int[] getBuckets(int[] s, bool getEnds) { 
-			return null;
-		}
-
-		public static void mapLSType(int[] s, bool[] t) {
+		public static void mapLSType (int[] s, bool[] t)
+		{
 			for (int i = s.Length - 1; i >= 0; i--) {
 				if (i == s.Length - 1) {
 					t [i] = STYPE;
-				} else if (s [i] > s [i + 1] || s [i] == s [i + 1] && t [i + 1] == LTYPE) {
+				} else if (s [i] > s [i + 1] || 
+				           s [i] == s [i + 1] && t [i + 1] == LTYPE) {
 					t [i] = LTYPE;
 				} else {
 					t [i] = STYPE;
@@ -267,45 +258,34 @@ namespace bioinf_sufix_array
 			}
 		}
 
-
-		public static void bucketSort(int[] a, int[] b, int[] s, int n1, int alphabetSize, int d) {
+		public static void bucketSort (int[] a, int[] b, int[] s, int n1, 
+		                               int alphabetSize, int d)
+		{
 
 			int[] c = new int[alphabetSize];
 
 			for (int i = 0, j = 0; i < n1; i++) {
 				j = a [i] + d;
 				j = (j > s.Length - 1) ? s.Length - 1 : j;
-				c [s[j]]++;
+				c [s [j]]++;
 			}
 
 			for (int i = 0, sum = 0; i < alphabetSize; i++) {
-				int t = c [i]; c [i] = sum; sum += t; 
+				int t = c [i];
+				c [i] = sum;
+				sum += t; 
 			}
 
 			for (int i = 0, j = 0; i < n1; i++) {
 				j = a [i] + d;
 				j = (j > s.Length - 1) ? s.Length - 1 : j;
-				b[c[s [j]]++] = a[i];
+				b [c [s [j]]++] = a [i];
 			}
 		}
 
-		public static int[] getBucketBySiblings(int[] a, byte[] s, int n1, int alphabetSize, int d) {
-			int[] c = new int[alphabetSize + 1];
-
-			for (int i = 0, j = 0; i < n1; i++) {
-				j = a [i] + d;
-				j = (j > s.Length - 1) ? s.Length - 1 : j;
-				c [s[j]]++;
-			}
-
-			for (int i = 0, sum = 0; i < alphabetSize + 1; i++) {
-				int t = c [i]; c [i] = sum; sum += t; 
-			}
-			return c;
-		}
-
-
-		public static void bucketSortLS(int[] a, int[] b, int[] s, bool[] t,  int n1, int d) {
+		public static void bucketSortLS (int[] a, int[] b, int[] s, bool[] t, 
+		                                 int n1, int d)
+		{
 
 			int[] c = {0, n1 - 1};
 
