@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <d_critical.h>
 
-void find_lms(char* s, int N, bool* LMS);
+
 
 int main()
 {
@@ -105,7 +105,7 @@ int j=0,alphabetSize=256;
 
     bucket_sort_LS(P1, a, d+1, n1, N, s, LS_type);
 
-    printf("SortLS:");
+    printf("\nSortLS:");
     for(j=0;j<=n1;j++)
     {
         printf(" %d", a[j]);
@@ -133,6 +133,64 @@ int j=0,alphabetSize=256;
             printf(" %d", P1[j]);
         }
         printf("\n");
+    }
+
+//naming P1
+int name=0;
+int tmp[N+1], S1[n1+1];
+bool diff=false;
+
+    for(i=0;i<=N;i++)
+    {
+        tmp[i]=-1;
+    }
+
+    S1[0]=name;
+    for(i=1; i<=n1; i++)
+    {
+        diff=false;
+        for(j=0;j<d+2;j++)
+        {
+            if(Sw[P1[i-1]+j] != Sw[P1[i]+j])
+            {
+                diff=true;
+                S1[i]=++name;
+                break;
+            }
+        }
+        if(!diff)
+        {
+            S1[i]=name;
+        }
+    }
+
+    for(i=0;i<=n1;i++)
+    {
+        tmp[P1[i]]=S1[i];
+    }
+
+    for(i=0,j=0;i<=N;i++)
+    {
+        if(tmp[i]!=-1) S1[j++]=tmp[i];
+    }
+
+    printf("\nS1:");
+    for(i=0;i<=n1;i++)
+    {
+        printf(" %d", S1[i]);
+    }
+    printf("\nn1=%d",n1);
+
+//int SA1[n1+1];
+
+    if(name<n1)
+    {
+        printf("\nidemo u rekurziju :)");
+        //rekurzivni poziv SA-DS
+    }
+    else
+    {
+        //induciranje
     }
 
 return 0;
