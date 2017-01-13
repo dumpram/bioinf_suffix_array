@@ -57,9 +57,9 @@ public class SuffixArrayConstruction {
 		time = System.nanoTime() - time;
 		long memoryAfter = r.totalMemory() - r.freeMemory();
 		
-		System.out.println(isSorted(SA, s, SA.length));
+		//System.out.println(isSorted(SA, s, SA.length));
 		
-		System.out.println((int)(time / 1e6) + " " + (memoryAfter - memoryBefore));
+		//System.out.println((int)(time / 1e6) + " " + (memoryAfter - memoryBefore));
 		
 		
 		List<String> outLines = new ArrayList<String>(SA.length);

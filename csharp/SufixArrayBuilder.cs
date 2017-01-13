@@ -74,9 +74,9 @@ namespace bioinf_sufix_array
 			sw.Stop ();
 			long memoryAfter = currentProcess.PeakWorkingSet64;
 
-			Console.Out.WriteLine ("Is sorted:" + isSorted (sa, s, s.Length));
-			Console.Out.WriteLine (sw.ElapsedMilliseconds + " "
-			                       + (memoryAfter - memoryBefore));
+//			Console.Out.WriteLine ("Is sorted:" + isSorted (sa, s, s.Length));
+//			Console.Out.WriteLine (sw.ElapsedMilliseconds + " "
+//			                       + (memoryAfter - memoryBefore));
 			using (StreamWriter outputFile = new StreamWriter (output, true)) {
 				for (int i = 0; i < sa.Length; i++) {
 					outputFile.WriteLine (sa [i]);

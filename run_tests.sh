@@ -19,7 +19,7 @@ cd ..
 
 for i in {1..6}
 do
-  echo "Generating $i. soluton..."
+  echo "Generating $i. solution..."
   ./referent_model/is tests/test-$i.txt solutions/solution-$i.txt 2> /dev/null
 done
  
@@ -32,7 +32,7 @@ do
             for dir in "${solution_dirs[@]}"
             do
                 cd $dir
-                make d=$d in=../tests/test-$i.txt out=../out.txt >> \
+                cgmemtime -t make d=$d in=../tests/test-$i.txt out=../out.txt &>> \
                     ../results-$dir.txt
                 cd ..
                 cmp --silent out.txt solutions/solution-$i.txt > /dev/null
