@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <d_critical.h>
 
-
+void SA_DS(int* s, int N, int alphabetSize, int d);
 
 int main()
 {
@@ -55,12 +55,23 @@ int z=0;
     printf("\nz=%d\n", z);
     fclose(fp);
 
+int alphabetSize=256;
+int d=2;
+
+    SA_DS(s, N, alphabetSize, d);
+
+return 0;
+}
+
+
+void SA_DS(int* s, int N, int alphabetSize, int d){
 // start of algorithm
 bool LMS_characters[N+1];
 bool LS_type[N+1];
+int i=0;
 
     find_lms_characters(s, N, LMS_characters, LS_type);
-    printf("LS=       ");
+    printf("\nLS=       ");
     for(i=0;i<=N;i++)
     {
         printf("%d",LS_type[i]);
@@ -68,7 +79,7 @@ bool LS_type[N+1];
     printf("\n");
 
     printf("LMS_ch=   ");
-    for(i=0;i<=N;i++)
+    for(i=0;i<=N;i++,alphabetSize=256)
     {
         printf("%d",LMS_characters[i]);
     }
@@ -76,9 +87,12 @@ bool LS_type[N+1];
 bool d_critical_ch[N+1];
 int n1;
 int P1[(N+1)/2];
-int d=2;
 
     n1=find_d_critical_characters(LMS_characters, N, d, d_critical_ch, P1);
+
+int P_1[n1+1];
+    memcpy(P_1,P1,sizeof(int)*(n1+1));
+
     printf("\nd_crit_ch=");
     for(i=0;i<=N;i++)
     {
@@ -101,7 +115,7 @@ int Sw[N+1];
 
 //Bucket LS
 int a[n1+1], b[n1+1];
-int j=0,alphabetSize=256;
+int j=0;
 
     bucket_sort_LS(P1, a, d+1, n1, N, s, LS_type);
 
@@ -174,25 +188,103 @@ bool diff=false;
         if(tmp[i]!=-1) S1[j++]=tmp[i];
     }
 
-    printf("\nS1:");
+    printf("S1:");
     for(i=0;i<=n1;i++)
     {
         printf(" %d", S1[i]);
     }
     printf("\nn1=%d",n1);
 
-//int SA1[n1+1];
-
     if(name<n1)
     {
-        printf("\nidemo u rekurziju :)");
-        //rekurzivni poziv SA-DS
-    }
-    else
-    {
-        //induciranje
+        printf("\n\nidemo u rekurziju :)");
+        SA_DS(S1, n1, alphabetSize, d);
     }
 
-return 0;
+        printf("\n\nsad idemo u induciranje\n");
+        //inducing Step1
+        int SA1[n1+1];
+        int SA[N+1];
 
+        memcpy(SA1,S1,sizeof(int)*(n1+1));
+        printf("SA1: ");
+        for(i=0;i<=n1;i++)
+        {
+            printf("%d ", SA1[i]);
+        }
+
+        for(i=0;i<=N;i++)
+        {
+            SA[i]=-1;
+        }
+        printf("\nSA: ");
+        for(i=0;i<=N;i++)
+        {
+            printf("%d ", SA[i]);
+        }
+
+int bucket_end[alphabetSize], bucket_start[alphabetSize];
+int bucket_end3[alphabetSize];
+int temp=0, sum=0;
+        memset(bucket_end, 0, alphabetSize*sizeof(int));
+        for(i=0;i<=N;i++)
+        {
+            bucket_end[s[i]]++;
+        }
+        for(i=0;i<=alphabetSize;i++)
+        {
+            temp=bucket_end[i];
+            bucket_start[i]=sum;
+            sum += temp;
+            bucket_end[i]=bucket_end3[i]=sum-1;
+        }
+
+        for(i=n1;i>=0;i--)
+        {
+            if(LMS_characters[P_1[SA1[i]]]==true)
+            {
+                SA[bucket_end[s[P_1[SA1[i]]]]--]=P_1[SA1[i]];
+            }
+        }
+        printf("\nSA: \nStep 1: ");
+        for(j=0;j<=N;j++)
+        {
+            printf("%d ", SA[j]);
+        }
+
+        //inducing step2
+        for(i=0;i<=N;i++)
+        {
+            if(SA[i]>0)
+            {
+                if(LS_type[SA[i]-1]==false)
+                {
+                    SA[bucket_start[s[SA[i]-1]]++]=SA[i]-1;
+                }
+            }
+        }
+
+        printf("\nStep 2: ");
+        for(j=0;j<=N;j++)
+        {
+            printf("%d ", SA[j]);
+        }
+        //inducing step3
+        for(i=N;i>=0;i--)
+        {
+            if(SA[i]>0)
+            {
+                if(LS_type[SA[i]-1]==true)
+                {
+                    SA[bucket_end3[s[SA[i]-1]]--]=SA[i]-1;
+                }
+            }
+        }
+        printf("\nStep 3: ");
+        for(j=0;j<=N;j++)
+        {
+            printf("%d ", SA[j]);
+
+        }
 }
+
