@@ -284,7 +284,7 @@ int temp=0, sum=0;
         for(j=0;j<=N;j++)
         {
             printf("%d ", SA[j]);
-
         }
+        memcpy(s,SA,sizeof(int)*(N+1));
 }
 
