@@ -27,7 +27,6 @@ do
                 else
                     echo "Verification of $dir for d=$d for test-$i failed!"
                 fi
-
             done
         done
 done
