@@ -10,9 +10,24 @@ do
     rm results-$dir.txt
 done
 
-for d in {2..10}
+mkdir solutions
+
+cd referent_model
+make clean &> /dev/null
+make &> /dev/null
+cd ..
+
+for i in {1..6}
 do
-    for i in {1..10}
+  echo "Generating $i. soluton..."
+  ./referent_model/is tests/test-$i.txt solutions/solution-$i.txt 2> /dev/null
+done
+ 
+echo "Solutions generated..."
+
+for d in {2..4}
+do
+    for i in {1..6}
         do
             for dir in "${solution_dirs[@]}"
             do
@@ -20,7 +35,7 @@ do
                 make d=$d in=../tests/test-$i.txt out=../out.txt >> \
                     ../results-$dir.txt
                 cd ..
-                diff out.txt solutions/solution-$i.txt
+                cmp --silent out.txt solutions/solution-$i.txt > /dev/null
                 verify=$?
                 if [ $verify -eq 0 ]; then
                     echo "Verification of $dir for d=$d for test-$i successful!"
@@ -30,3 +45,7 @@ do
             done
         done
 done
+
+rm out.txt
+rm -rf solutions
+echo "Verification ended"

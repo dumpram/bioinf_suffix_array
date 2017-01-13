@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
 	bool first_line = true;
 	int new_cnt = 0;
 	char pom;
-
+	/*
 	for (int i = 0; i < n - 1; i++) {
 		fread(&pom, 1, 1, stdin);
 		if (pom == EOF) {
@@ -99,10 +99,16 @@ int main(int argc, char **argv) {
 		} else if (pom != '\n' && pom != EOF) {
 			s_ch[new_cnt++] = pom;
 		}
+	}*/
+	string line;
+	while (getline(cin, line)) {
+		if (line.at(0) == '>') {
+			continue;		
+		}
+		for (int i = 0; i < line.length(); i++) {
+			s_ch[new_cnt++] = line.at(i); 
+		}
 	}
-
-
-
 	s_ch[new_cnt++] = 0; // append the virtual sentinel
 
 	fprintf(stderr, "new_cnt: %d\n", new_cnt);
