@@ -6,23 +6,35 @@
 
 void SA_DS(int* s, int N, int alphabetSize, int d);
 
-int main()
+int main(int argc, char *argv[])
 {
+int i, d;
+
+    if(argc<4)
+    {
+        printf("\nNeed 3 arguments: d, input file, output file\n");
+        return 1;
+    }
+
+    d=atoi(argv[1]);
+
 FILE *fp;
 FILE *ffp;
-int n, N, i;
+int n, N;
 
-//opening file and saving characters into an array
-    if(!(fp = fopen("test.txt", "r+")))
+//opening input file and saving characters into an array
+    if(!(fp = fopen(argv[2], "r+")))
     {
         printf("Nemrem otprt file");
+        return 1;
     }
     if(fseek(fp,0,SEEK_END) != 0)
     {
         printf("Ne mogu doci do kraja file-a");
+        return 1;
     }
     n = ftell(fp);
-    printf("%d\n", n);
+    printf("\n%d\n", n);
 
 //char s[n];
 int *s = (int*) malloc(sizeof(int)*n);
@@ -32,6 +44,7 @@ int z=0;
      if(fseek(fp,0,SEEK_SET) != 0)
     {
         printf("Ne mogu doci do pocetka file-a");
+        return 1;
     }
     for(i=0; i<n; i++)
     {
@@ -57,11 +70,11 @@ int z=0;
 
     if(fclose(fp)!=0)
     {
-        printf("\nNisam dobro sam zatvorio stream test.txt\n");
+        printf("\nNisam dobro sam zatvorio stream %s\n", argv[2]);
+        return 1;
     }
 
 int alphabetSize=256;
-int d=2;
 
     SA_DS(s, N, alphabetSize, d);
 
@@ -72,14 +85,15 @@ int d=2;
     }
 
 //write the output in file "out.txt"
-        ffp = fopen("out.txt", "w");
+        ffp = fopen(argv[3], "w");
         for(i=0;i<=N;i++)
         {
             fprintf(ffp,"%d%s",s[i],"\n");
         }
         if(fclose(fp)!=0)
         {
-            printf("\nNisam dobro sam zatvorio stream out.txt\n");
+            printf("\nNisam dobro zatvorio stream %s\n",argv[3]);
+            return 1;
         }
 
 return 0;
