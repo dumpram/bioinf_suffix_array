@@ -9,6 +9,7 @@ void SA_DS(int* s, int N, int alphabetSize, int d);
 int main()
 {
 FILE *fp;
+FILE *ffp;
 int n, N, i;
 
 //opening file and saving characters into an array
@@ -53,12 +54,33 @@ int z=0;
         printf("%d ",s[i]);
     }
     printf("\nz=%d\n", z);
-    fclose(fp);
+
+    if(fclose(fp)!=0)
+    {
+        printf("\nNisam dobro sam zatvorio stream test.txt\n");
+    }
 
 int alphabetSize=256;
 int d=2;
 
     SA_DS(s, N, alphabetSize, d);
+
+    printf("\n\nRjesenje: ");
+    for(i=0;i<=N;i++)
+    {
+        printf("%d ",s[i]);
+    }
+
+//write the output in file "out.txt"
+        ffp = fopen("out.txt", "w");
+        for(i=0;i<=N;i++)
+        {
+            fprintf(ffp,"%d%s",s[i],"\n");
+        }
+        if(fclose(fp)!=0)
+        {
+            printf("\nNisam dobro sam zatvorio stream out.txt\n");
+        }
 
 return 0;
 }

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 
 void find_lms_characters(int* s, int N, bool* LMS_ch, bool* LS);
