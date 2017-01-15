@@ -97,15 +97,13 @@ int j=0;
 
 void bucket_sort(int *a, int *b, int *s, int *c, int n1, int N, int alphabetSize, int d)
 {
-    //printf("%d ",n1);
-      // we have number of alphabet size buckets
 int i=0;
 int j=0;
 int sum=0;                  // assistant variable
 int tmp=0;                  // assistant variable
     memset(c, 0, alphabetSize*sizeof(int));
     for(i=0;i<=n1;i++)
-    {//ovdje sjebe negdje
+    {
         j=a[i] + d;
         if(j>N) j=N;
         c[s[j]]++;          // we calculate number of appearance for each letter
