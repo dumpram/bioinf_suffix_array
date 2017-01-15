@@ -3,7 +3,7 @@
 compile_script_name="compile"
 run_script_name="run"
 
-declare -a solution_dirs=("csharp" "java")
+declare -a solution_dirs=("csharp" "java" "clang")
 
 for dir in "${solution_dirs[@]}"
 do
