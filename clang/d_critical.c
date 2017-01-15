@@ -95,10 +95,10 @@ int j=0;
     }
 }
 
-void bucket_sort(int *a, int *b, int *s, int n1, int N, int alphabetSize, int d)
+void bucket_sort(int *a, int *b, int *s, int *c, int n1, int N, int alphabetSize, int d)
 {
-    printf("%d ",n1);
-int *c=(int*) malloc(sizeof(int)*alphabetSize);        // we have number of alphabet size buckets
+    //printf("%d ",n1);
+      // we have number of alphabet size buckets
 int i=0;
 int j=0;
 int sum=0;                  // assistant variable
@@ -123,7 +123,6 @@ int tmp=0;                  // assistant variable
         if(j>N) j=N;
         b[c[s[j]]++] = a[i];    // sorting P1
     }
-free(c);
 }
 
 

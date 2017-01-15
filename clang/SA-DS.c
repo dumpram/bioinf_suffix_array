@@ -52,19 +52,32 @@ char c='\0'; // variable in which characters from input file is written in
         printf("\nCould not make to the beginning of the input file to start saving characters into the array s\n");
         return -1;
     }
+
+	bool isStartOfLine = true;
+	bool waitNewLine = false;
     for(i=0; i<n; i++)
     {
         if( fread(&c, sizeof(char), 1, fp) != 1)
         {
             break; //EOF
         }
-        if(c != '\n') s[i]=(int)c;  // if there is no new line save character in array s
-        else i--;                   // else: don't save new line as a character
+		if(c == '>' && isStartOfLine) {
+			isStartOfLine = false;
+			waitNewLine = true;
+		}
+        if(c != '\n' && !waitNewLine) s[i]=(int)c;  // if there is no new line save character in array s
+        else if (c == '\n') {
+			i--; 
+			waitNewLine = false;
+			isStartOfLine = true;
+		} else {
+			i--;
+		}                   // else: don't save new line as a character
     }
-    s[i]='$';                       // put $ sign on the end of the array s
+    s[i]='0';                       // put $ sign on the end of the array s
     N = i;                          // store the number of characters in s including $
     s = (int*) realloc(s,sizeof(int)*(N+1));
-    printf("N=%d",i);
+    //printf("N=%d",i);
     if(DEBUG)
     {
         printf("\nNumber of characters in the array S:%d\n", N+1);
@@ -98,7 +111,7 @@ char c='\0'; // variable in which characters from input file is written in
         {
             fprintf(ffp,"%d%s",s[i],"\n");  // each index is in the new line
         }
-        if(fclose(fp)!=0)
+        if(fclose(ffp)!=0)
         {
             printf("\nCould not close the stream %s\n",argv[3]);
             return -1;
@@ -110,7 +123,7 @@ return 0;
 
 
 void SA_DS(int *s, int N, int alphabetSize, int d){
-    //if(DEBUG)
+    if(DEBUG)
     {
         printf("\nEntered in SA-DS\n");
     }
@@ -156,11 +169,13 @@ int j=0;            // variable used in loops
         printf("\n\n");
     }
 // now we are doing bucket sorting with number of alphabet characters in d+2 steps
+
+	int *c = (int *) malloc(sizeof(int) *alphabetSize);
     for(i=0; i<d+2;i++)
     {
         if(i % 2 == 0)
         {
-            bucket_sort(a, b, s, n1, N, alphabetSize, d+1-i);
+            bucket_sort(a, b, s, c, n1, N, alphabetSize, d+1-i);
             if(DEBUG)
             {
                 memcpy(P1,b,sizeof(int)*(n1+1));
@@ -168,7 +183,7 @@ int j=0;            // variable used in loops
         }
         else
         {
-            bucket_sort(b, a, s, n1, N, alphabetSize, d+1-i);
+            bucket_sort(b, a, s, c, n1, N, alphabetSize, d+1-i);
             if(DEBUG)
             {
                 memcpy(P1,a,sizeof(int)*(n1+1));
@@ -184,6 +199,8 @@ int j=0;            // variable used in loops
             printf("\n");
         }
     }
+
+	free(c);
     if(i % 2 == 0)
     {
         memcpy(P1,a,sizeof(int)*(n1+1));    // copy pointers on d-critical characters from right buffer
@@ -240,16 +257,23 @@ bool diff=false;
         printf("\nn1=%d",n1);
     }
     free(tmp);
-// recursive call if there is two same names in S1
-    if(name<n1)
-    {
-        SA_DS(S1, n1, alphabetSize, d);
-    }
-//inducing Step1
-int *SA1=(int*) malloc(sizeof(int)*(n1+1));  // buffer
-int *SA=(int*) malloc(sizeof(int)*(N+1));    // suffix array
 
-        memcpy(SA1,S1,sizeof(int)*(n1+1)); //copy S1 in SA1
+	int *SA1=(int*) malloc(sizeof(int)*(n1+1));  // buffer
+	int *SA=(int*) malloc(sizeof(int)*(N+1));    // suffix array
+// recursive call if there is two same names in S1
+    if(name < n1)
+    {
+        SA_DS(S1, n1, name + 1, d);
+		memcpy(SA1,S1,sizeof(int)*(n1+1)); //copy S1 in SA1
+    } else {
+		for (i = 0; i <= n1; i++) {
+			SA1[S1[i]] = i;
+		}
+	}
+//inducing Step1
+
+
+        //
         if (DEBUG)
         {
             printf("\n\nSA1: ");
