@@ -41,18 +41,18 @@ bool isSorted(unsigned int *SA, unsigned char *s, unsigned int n) {
 }
 
 int main(int argc, char **argv) {
-	fprintf( stderr, "\nComputing suffix array by SA-DS (d=3) on " );
+	//fprintf( stderr, "\nComputing suffix array by SA-DS (d=3) on " );
 	if ( argc > 1 ) {
 		freopen( argv[ 1 ], "rb", stdin );
-		fprintf( stderr, "%s", argv[ 1 ] );
+	//	fprintf( stderr, "%s", argv[ 1 ] );
 	} else
-		fprintf( stderr, "stdin" );
+	//	fprintf( stderr, "stdin" );
 	fprintf( stderr, " to " );
 	if ( argc > 2 ) {
 		freopen( argv[ 2 ], "w", stdout );
-		fprintf( stderr, "%s", argv[ 2 ] );
+	//	fprintf( stderr, "%s", argv[ 2 ] );
 	} else
-		fprintf( stderr, "stdout" );
+	//	fprintf( stderr, "stdout" );
 	fprintf( stderr, "\n" );
 	#if !defined( unix )
 	setmode( fileno( stdin ), O_BINARY );
@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
   }
   //n--; za ukloniti novi red
   	n++; // count for the virtual sentinel
-	fprintf(stderr, "Allocating input and output space: %d bytes = %.3lf MB", 5*n, (double)5*n/1024/1024);
+	//fprintf(stderr, "Allocating input and output space: %d bytes = %.3lf MB", 5*n, (double)5*n/1024/1024);
 	unsigned char *s_ch=new unsigned char[n];
 	int *SA = new int[n];
 	if(s_ch==NULL || SA==NULL) {
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 	}
 
 	// read the string into buffer.
-	fprintf(stderr, "\nReading input string...");
+	//fprintf(stderr, "\nReading input string...");
 	fseek(stdin, 0, SEEK_SET );
 
 	//fread((unsigned char *) s_ch, 1, n-1, stdin);
@@ -103,15 +103,15 @@ int main(int argc, char **argv) {
 	string line;
 	while (getline(cin, line)) {
 		if (line.at(0) == '>') {
-			continue;		
+			continue;
 		}
 		for (int i = 0; i < line.length(); i++) {
-			s_ch[new_cnt++] = line.at(i); 
+			s_ch[new_cnt++] = line.at(i);
 		}
 	}
 	s_ch[new_cnt++] = 0; // append the virtual sentinel
 
-	fprintf(stderr, "new_cnt: %d\n", new_cnt);
+	//fprintf(stderr, "new_cnt: %d\n", new_cnt);
 
 	clock_t start, finish;
 	double  duration;
@@ -122,14 +122,14 @@ int main(int argc, char **argv) {
 	finish = clock();
 	duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-	fprintf( stderr, "\nSize: %d bytes, Time: %5.4f seconds\n", new_cnt - 1, duration);
+	//fprintf( stderr, "\nSize: %d bytes, Time: %5.4f seconds\n", new_cnt - 1, duration);
 
 #ifdef _verify_sa
-	fprintf( stderr, "\nVerifying the suffix array...");
-	fprintf( stderr, "\nSorted: %d", (int)isSorted((unsigned int *)SA, (unsigned char *)s_ch, (unsigned int)new_cnt));
+	//fprintf( stderr, "\nVerifying the suffix array...");
+	//fprintf( stderr, "\nSorted: %d", (int)isSorted((unsigned int *)SA, (unsigned char *)s_ch, (unsigned int)new_cnt));
 #endif
 
-	fprintf( stderr, "\nOutputing the suffix array...");
+	//fprintf( stderr, "\nOutputing the suffix array...");
 	for(int i=0; i<new_cnt; i++) {
 		fprintf(stdout, "%d\n", *(SA + i));
 	}

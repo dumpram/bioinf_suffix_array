@@ -1,6 +1,6 @@
 // This is the sample code for the SA-DS algorithm presented in our article:
-// G. Nong, S. Zhang and W. H. Chan, Two Efficient Algorithms for Linear Time Suffix Array Construction, 
-// IEEE Transactions on Computers, Vol. 60, No. 10, Oct. 2011. 
+// G. Nong, S. Zhang and W. H. Chan, Two Efficient Algorithms for Linear Time Suffix Array Construction,
+// IEEE Transactions on Computers, Vol. 60, No. 10, Oct. 2011.
 // which draft can be retrieved at: http://code.google.com/p/ge-nong/
 
 #include <iostream>
@@ -26,35 +26,35 @@ void timer_start() {
 }
 
 void timer_finish(char *str) {
-	finish = clock(); 
-	duration = (double)(finish - start) / CLOCKS_PER_SEC; 
-	fprintf( stderr, "\n%s: %.2lf seconds", str, duration);
+	finish = clock();
+	duration = (double)(finish - start) / CLOCKS_PER_SEC;
+	//fprintf( stderr, "\n%s: %.2lf seconds", str, duration);
 }
 
 // sort a[0..n-1] to b[0..n-1] according to the LS-types of characters from s
-static void radixPassLS(int *a, int *b, unsigned char *s, unsigned char *t, int n1, int K, 
-					  int n, int cs, int d) 
+static void radixPassLS(int *a, int *b, unsigned char *s, unsigned char *t, int n1, int K,
+					  int n, int cs, int d)
 { // count occurrences
   int i, j;
   int c[]={0, n1-1}; // counter array
   for (i = 0;  i < n1;  i++) {
-	  j=a[i]+d; 
-    if(j>n-1) j=n-1; 
+	  j=a[i]+d;
+    if(j>n-1) j=n-1;
 	  if(tget(j)) b[c[1]--] = a[i]; // type-S
 	  else b[c[0]++] = a[i]; // type-L
   }
 }
 
 // stably sort a[0..n-1] to b[0..n-1] with keys in 0..K from s
-static void radixPass(int *a, int *b, unsigned char *s, unsigned char *t, int n1, int K, 
-					  int n, int cs, int d) 
+static void radixPass(int *a, int *b, unsigned char *s, unsigned char *t, int n1, int K,
+					  int n, int cs, int d)
 { // count occurrences
   int i, j, sum, ch;
   int K2=K+2;
   int* c = new int[K2]; // counter array
   for (i = 0;  i < K2;  i++) c[i] = 0; // reset counters
   for (i = 0;  i < n1;  i++) {
-	  j=a[i]+d; 
+	  j=a[i]+d;
     ch=(j>=n-1) ? 0 : chr(j)+1;
  	  c[ch]++; // count occurences
   }
@@ -62,7 +62,7 @@ static void radixPass(int *a, int *b, unsigned char *s, unsigned char *t, int n1
      int t = c[i];  c[i] = sum;  sum += t;
   }
   for (i = 0;  i < n1;  i++) {
-	  j=a[i]+d; 
+	  j=a[i]+d;
     ch=(j>=n-1) ? 0 : chr(j)+1;
     b[c[ch]++] = a[i]; // sort non-sentinel characters
   }
@@ -70,10 +70,10 @@ static void radixPass(int *a, int *b, unsigned char *s, unsigned char *t, int n1
   delete [] c;
 }
 
-// stably sort a[0..n-1] to b[0..n-1] with keys in 0..K^2 from 
+// stably sort a[0..n-1] to b[0..n-1] with keys in 0..K^2 from
 //   s with a virtual sentinel 0
-static void radixPass2(int *a, int *b, unsigned char *s, unsigned char *t, int n1, int K, 
-					  int n, int cs, int d) 
+static void radixPass2(int *a, int *b, unsigned char *s, unsigned char *t, int n1, int K,
+					  int n, int cs, int d)
 { // count occurrences
   int i, j, j1, sum;
   int K2=K+2, K22=K2*K2; // count for the virtual sentinel
@@ -115,7 +115,7 @@ int criticalChars(unsigned char *s, unsigned char *t, int *p1, int n, int cs) {
 }
 
 // compute the start and end of each bucket, and init SA
-void getBuckets(unsigned char *s, int *bkt, int n, int K, int cs, bool end) { 
+void getBuckets(unsigned char *s, int *bkt, int n, int K, int cs, bool end) {
   int i, sum=0;
   for(i=0; i<=K; i++) bkt[i]=0; // clear all buckets
   for(i=0; i<n; i++) bkt[chr(i)]++; // compute the size of each bucket
@@ -132,7 +132,7 @@ void SA_DS(unsigned char *s, int *SA, int n, int K, int m, int level) {
   static long sum_n=0, sum_n1=0;
   int cs=(level==0) ? sizeof(char) : sizeof(int);
 
-  fprintf(stderr, "\nLevel: %d", level);
+ // fprintf(stderr, "\nLevel: %d", level);
 
   int i, j;
   unsigned char *t=new unsigned char[n/8+1]; // LS-type array in bits
@@ -151,19 +151,19 @@ void SA_DS(unsigned char *s, int *SA, int n, int K, int m, int level) {
 
   // lsb radix sort critical 5-tuplets
   int *a=SA1, *b=SA1+n1;
-  radixPassLS(a, b, s, t, n1, K, n, cs, 4);  	
+  radixPassLS(a, b, s, t, n1, K, n, cs, 4);
   radixPass(b, a, s, t, n1, K, n, cs, 4);
   if(level==0) {
 	    // speed-up bucket sorting on level 0, two characters per item
 	    radixPass2(a, b, s, t, n1, K, n, cs, 2);
-      radixPass2(b, a, s, t, n1, K, n, cs, 0); 
+      radixPass2(b, a, s, t, n1, K, n, cs, 0);
   }
   else {
 	  // normal bucket sort, one character per item
       radixPass(a, b, s, t, n1, K, n, cs, 3);
       radixPass(b, a, s, t, n1, K, n, cs, 2);
       radixPass(a, b, s, t, n1, K, n, cs, 1);
-      radixPass(b, a, s, t, n1, K, n, cs, 0); 	
+      radixPass(b, a, s, t, n1, K, n, cs, 0);
   }
   timer_finish("Time for sorting all the d-critical substrings");
 
@@ -179,14 +179,14 @@ void SA_DS(unsigned char *s, int *SA, int n, int K, int m, int level) {
 	  int d, pos=SA[i]; bool diff=false;
     for(d=0; d<4; d++)
       if(weight(pos+d)!=c[d]) {diff=true; break;}
-	  if(weight1(pos+4)!=c[4]) diff=true; 
-    if(pos+4>=n-1 || diff) { 
+	  if(weight1(pos+4)!=c[4]) diff=true;
+    if(pos+4>=n-1 || diff) {
       name++;
       for(d=0; d<4; d++)
         c[d]=(pos+d<n)?weight(pos+d):-1;
 		  c[d]=(pos+d<n)?weight1(pos+d):-1;
     }
-    SA[n1+pos/2]=name-1; 
+    SA[n1+pos/2]=name-1;
   }
   for(i=n1+(n-1)/2, j=m-1; i>=n1; i--)
 	  if(SA[i]>=0) SA[j--]=SA[i];
@@ -197,7 +197,7 @@ void SA_DS(unsigned char *s, int *SA, int n, int K, int m, int level) {
 
   // stage 2: solve the reduced problem
 
-  fprintf(stderr, "\nReduction ratio: %.2lf", (double)n1/n);
+  //fprintf(stderr, "\nReduction ratio: %.2lf", (double)n1/n);
   redu_ratio += (double)n1/n;
   sum_n1+=n1; sum_n+=n;
   // recurse if names are not yet unique
@@ -205,12 +205,12 @@ void SA_DS(unsigned char *s, int *SA, int n, int K, int m, int level) {
     SA_DS((unsigned char*)s1, SA1, n1, name-1, m-n1, level+1);
   } else { // generate the suffix array of s1 directly
     for(i=0; i<n1; i++) SA1[s1[i]] = i;
-	cerr << endl << "Recusion ends";
-	fprintf(stderr, "\nMean reduction ratio over iterations: %.2lf", redu_ratio/(level+1));
-	fprintf(stderr, "\nMean reduction ratio over characters: %.2lf", (double)sum_n1/sum_n);
+	//cerr << endl << "Recusion ends";
+	//fprintf(stderr, "\nMean reduction ratio over iterations: %.2lf", redu_ratio/(level+1));
+	//fprintf(stderr, "\nMean reduction ratio over characters: %.2lf", (double)sum_n1/sum_n);
   }
 
-  fprintf(stderr, "\nLevel: %d", level);
+//  fprintf(stderr, "\nLevel: %d", level);
 
   // stage 3: induce the result for the original problem
 
@@ -234,19 +234,19 @@ void SA_DS(unsigned char *s, int *SA, int n, int K, int m, int level) {
   if(level==0)
     bkt[0]++; // handle the virtual sentinel
   for(i=0; i<n; i++) {
-	  j=SA[i]-1; 
+	  j=SA[i]-1;
 	  if(j>=0 && !tget(j)) SA[bkt[chr(j)]++]=j;
   }
 
   // compute SAs
   getBuckets(s, bkt, n, K, cs, true); // find ends of buckets
   for(i=n-1; i>0; i--) {
-	  j=SA[i]-1; 
+	  j=SA[i]-1;
 	  if(j>=0 && tget(j)) SA[--bkt[chr(j)]]=j;
   }
 
   timer_finish("Time for sorting all the suffixes");
 
-  delete [] bkt; 
+  delete [] bkt;
   delete [] t;
 }

@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.io.PrintWriter;
 
 public class SuffixArrayConstruction {
 
@@ -16,18 +17,18 @@ public class SuffixArrayConstruction {
 	public static boolean BUCKET_START = false;
 
 	static int d = 2;
-	
-	
+
+
 	public static void main(String[] args) throws IOException {
 		Runtime r = Runtime.getRuntime();
-		
+
 		d = Integer.parseInt(args[0]);
 		String in = args[1];
 		String out = args[2];
-		
+
 		List<String> lines = Files.readAllLines(Paths.get(in));
 		List<Integer> array = new ArrayList<Integer>();
-		
+
 		for (String line : lines) {
 				if (line.startsWith(">")) {
 					continue;
@@ -37,7 +38,7 @@ public class SuffixArrayConstruction {
 				}
 		}
 		array.add(0);
-		
+
 		int[] SA = new int[array.size()];
 		int[] s = new int[array.size()];
 		for (int i = 0; i < array.size(); i++) {
@@ -46,27 +47,33 @@ public class SuffixArrayConstruction {
 		lines = null;
 		array = null;
 		System.gc();
-		
+
 		/**
 		 * Call SADS and record time and memory consumption.
 		 */
 		long memoryBefore = r.totalMemory() - r.freeMemory();
 		long time = System.nanoTime();
-		
+
 		SA_DS(s, SA, 256, 0);
 		time = System.nanoTime() - time;
 		long memoryAfter = r.totalMemory() - r.freeMemory();
-		
+
 		//System.out.println(isSorted(SA, s, SA.length));
-		
+
 		//System.out.println((int)(time / 1e6) + " " + (memoryAfter - memoryBefore));
-		
-		
-		List<String> outLines = new ArrayList<String>(SA.length);
-		for (int i = 0; i < SA.length; i++) {
-			outLines.add(Integer.toString(SA[i]));
-		}
-		Files.write(Paths.get(out), outLines);
+
+
+		//List<String> outLines = new ArrayList<String>(SA.length);
+        try {
+            PrintWriter printWriter = new PrintWriter(out, "UTF-8");
+    		for (int i = 0; i < SA.length; i++) {
+    			printWriter.println(SA[i]);
+    		}
+            printWriter.close();
+        } catch(Exception e) {
+            
+        }
+		//Files.write(Paths.get(out), outLines);
 	}
 
 	public static void SA_DS(int[] s, int[] SA, int alphabetSize, int recursionLevel) {

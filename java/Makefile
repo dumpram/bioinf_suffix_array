@@ -5,9 +5,9 @@ run : compile
 
 compile : SuffixArrayConstruction.class
 
-SuffixArrayConstruction.class :
+SuffixArrayConstruction.class : SuffixArrayConstruction.java
 	@javac SuffixArrayConstruction.java
 
 
-clean: 
+clean:
 	rm SuffixArrayConstruction.class

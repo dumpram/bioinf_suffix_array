@@ -20,7 +20,7 @@ cd ..
 for i in {1..6}
 do
   echo "Generating $i. solution..."
-  ./referent_model/is tests/test-$i.txt solutions/solution-$i.txt 2> /dev/null
+  cgmemtime -t ./referent_model/is tests/test-$i.txt solutions/solution-$i.txt 2> /dev/null &>> results-orig.txt
 done
  
 echo "Solutions generated..."
