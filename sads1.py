@@ -18,6 +18,7 @@ def sads(s):
     ## Step 1) Scan s once to classify all the characters as L-/S-type into t
     ## L-type => 0,  S-type => 1
     lens = len(s)-1
+    ##initialize dictionary with number of each character 
     alphDict = dict()                      
     alphDict[s[lens]] = 1
     #all characters set to 0 (L-type)
@@ -25,26 +26,40 @@ def sads(s):
     #the last character is S-type
     t[lens] = 1   
     for i in range(lens-1, -1, -1):
+        ##if S-type
         if s[i] < s[i+1]:
             t[i] = 1
         elif s[i] == s[i+1]:
             t[i] = t[i+1]
+        ##add character to dictionary
         if s[i] in alphDict:               
             alphDict[s[i]] += 1
         else:
             alphDict[s[i]] = 1
-        
+ 
     ##Step 2) Scan t once to find all the d-critical substrings in s into p1
     p1 = []
-    i = 1
-    while i < len(t):
-        ##if d-critical => append to p1 
-        if (t[i] == 1 and t[i-1] == 0) or ((i-d) in p1 and not (t[i+1] == 1
-            and t[i] == 0) and not any(x in p1 for x in range(i-d+1,i-1))):   
-            p1.append(i)
-            i += 1
-        i += 1
-
+    i = -1
+    j = 0
+    while i < len(t)-1:
+        isLMS = 0
+        ##check for LMS-substrings in s[i+2:i+d+1]
+        for k in range(2, d+2):
+            ##check if LMS
+            if (t[i+k] == 1 and t[i-1+k] == 0):
+                isLMS = 1
+                break
+        if j == 0 and isLMS == 0:
+            i += d
+            continue
+        ##find next d-critical substring
+        if isLMS == 1:
+            i += k
+        else:
+            i += d
+        p1.append(i)
+        j += 1
+    
     ##Step 3) Bucket sort all the d-critical substrings
     ##        using p1, bStart and bEnd       
     alphSorted = sorted(alphDict.keys())
