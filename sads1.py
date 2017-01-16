@@ -62,15 +62,21 @@ def sads(s):
     pairs = list((p1[i], subs[i]) for i in range(len(p1)))
 
     p2 = {}
-    p3 = sorted(pairs, key = lambda pair: pair[1])
-    #for i in range(d, -1, -1):
-    #    p2 = p3
-    #    p3 = sorted(p2, key = lambda pair: pair[1][i:d+2])
+    p3 = sorted(pairs, key = lambda pair: pair[1][d+1:d+3])
+    for i in range(d, -1, -1):
+        p2 = p3
+        p3 = sorted(p2, key = lambda pair: pair[1][i:d+3])
 
     ##Step 4) Name each d-critical substring in S by its bucket
     ##        index to get a new shortened string S1
     ##asigning number of bucket to every substring pointer (p1 element)     
-    p4 = list((x[0], subsAlph.index(x[1])) for x in p3)
+    p4 = []
+    p4.append((p3[0][0], 0))
+    j = 0
+    for i in range(1, len(p3)):
+        if p3[i][1] <> p3[i-1][1]:
+            j += 1
+        p4.append((p3[i][0], j))
     ##sorting substring pointers (p1 elements)
     s1 = sorted(p4, key = lambda pair: pair[0])
     ##s1 is list of buckets for every substring pointer
@@ -88,41 +94,41 @@ def sads(s):
 
     ##Step 6) Induce sa from sa1
     sa = [-1] * (lens+1)
-    bEnd = []
-    bEnd.append(0)
-    bStart = []
-    bStart.append(0)
+    bEnd = dict()
+    bEnd[alphSorted[0]] = 0
+    bStart = dict()
+    bStart[alphSorted[0]] = 0
     for i in range(1, len(alphSorted)):
-        bEnd.append(alphDict[alphSorted[i]] + bEnd[i-1])
-        bStart.append(alphDict[alphSorted[i-1]] + bStart[i-1])
+        bEnd[alphSorted[i]] = alphDict[alphSorted[i]] + bEnd[alphSorted[i-1]]
+        bStart[alphSorted[i]] = alphDict[alphSorted[i-1]] + bStart[alphSorted[i-1]]
 
     ##Induce sa algorithm: Step 1
     for i in range(len(sa1)-1,-1, -1):
         if t[p1[sa1[i]]] == 1 and t[p1[sa1[i]]-1] == 0:
             currS = s[p1[sa1[i]]]
-            sa[bEnd[alphSorted.index(currS)]] = p1[sa1[i]]
-            bEnd[alphSorted.index(currS)] -= 1
+            sa[bEnd[currS]] = p1[sa1[i]]
+            bEnd[currS] -= 1
 
     ##Induce sa algorithm: Step 2
     for i in range(len(sa)):
-        if sa[i]>= 0:
+        if sa[i] >= 0:
             if t[sa[i]-1] == 0:
                 currS = s[sa[i]-1]
-                sa[bStart[alphSorted.index(currS)]] = sa[i]-1
-                bStart[alphSorted.index(currS)] += 1
-        
+                sa[bStart[currS]] = sa[i]-1
+                bStart[currS] += 1
+         
     ##Induce sa algorithm: Step 3
-    bEnd = []
-    bEnd.append(0)
+    bEnd = dict()
+    bEnd[alphSorted[0]] = 0
     for i in range(1, len(alphSorted)):
-        bEnd.append(alphDict[alphSorted[i]] + bEnd[i-1])
+        bEnd[alphSorted[i]] = alphDict[alphSorted[i]] + bEnd[alphSorted[i-1]]
 
     for i in range(len(sa)-1, -1, -1):
         if sa[i] >=0:
             if sa[i] <> 0 and t[sa[i]-1] == 1:
                 currS = s[sa[i]-1]
-                sa[bEnd[alphSorted.index(currS)]] = sa[i]-1
-                bEnd[alphSorted.index(currS)] -= 1
+                sa[bEnd[currS]] = sa[i]-1
+                bEnd[currS] -= 1
 
     return sa
 
