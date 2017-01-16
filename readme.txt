@@ -6,6 +6,9 @@ A Python script for computing the suffix array of an input file
 using SA-DS algorithm by G. Nong, S. Zhang and W. H. Chan 
 presented in the article Two Efficient Algorithms for Linear Time Suffix Array Construction,
 IEEE Transactions on Computers, Vol. 60, No. 10, Oct. 2011.
+
+sads1.py
+A Python script similar to sads.py, but faster.
 --------------------------------------------------------------------------------------------
 How-To
 
