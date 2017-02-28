@@ -1,0 +1,7 @@
+﻿-t:library
+-debug:portable
+-nostdlib
+-nologo
+"tmp/dotnet-compile.assemblyinfo.cs"
+-out:"Program.exe"
+"Program.cs"

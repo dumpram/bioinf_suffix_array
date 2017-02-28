@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare -a solution_dirs=("csharp" "java" "clang" "python")
+declare -a solution_dirs=("clang" "csharp-mono" "csharp-net")
 
 for dir in "${solution_dirs[@]}"
 do
